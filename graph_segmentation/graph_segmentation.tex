@@ -1,0 +1,177 @@
+\documentclass[french, xcolor={rgb,dvipsnames,table,usenames}]{beamer}
+
+\mode<presentation>{
+\usecolortheme{magpie}
+}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+\title{MWE animation}
+
+
+\newcommand{\myGlobalTransformation}[2]
+{
+    \pgftransformcm{1}{0}{0.4}{0.5}{\pgfpoint{#1cm}{#2cm}}
+}
+
+
+\newcommand{\myGlobalTransformationbis}[2]
+{
+    \pgftransformcm{1}{0}{0.4}{0.3}{\pgfpoint{#1cm}{#2cm}}
+}
+
+\newcommand{\gridThreeD}[3]
+{
+    \begin{scope}
+        \myGlobalTransformation{#1}{#2};
+        \draw [#3,step=7cm] grid (7,7);
+    \end{scope}
+}
+
+\tikzstyle myBG=[line width=3pt,opacity=1.0]
+
+\newcommand{\drawLinewithBG}[2]
+{
+    \draw[white,myBG]  (#1) -- (#2);
+    \draw[black,very thick] (#1) -- (#2);
+}
+
+\newcommand{\graphLinesHorizontal}
+{
+    \drawLinewithBG{1,1}{7,1};
+    \drawLinewithBG{1,3}{7,3};
+    \drawLinewithBG{1,5}{7,5};
+    \drawLinewithBG{1,7}{7,7};
+}
+
+\newcommand{\graphLinesVertical}
+{
+    %swaps x and y coordinate (hence vertical lines):
+    \pgftransformcm{0}{1}{1}{0}{\pgfpoint{0cm}{0cm}}
+    \graphLinesHorizontal;
+}
+
+\newcommand{\graphThreeDnodes}[2]
+{
+    \begin{scope}
+        \myGlobalTransformation{#1}{#2};
+        \foreach \x in {1,3,5,7} {
+            \foreach \y in {1,3,5,7} {
+                \node at (\x,\y) [circle,fill=black,scale=0.3] {};
+                %this way circle of nodes will not be transformed
+            }
+        }
+    \end{scope}
+}
+
+\begin{document}
+
+
+\section{essai1}
+
+\begin{frame}
+\frametitle{\secname}
+
+\hspace*{-2cm}\resizebox{1.2\textwidth}{!}{
+\begin{tikzpicture}[
+    declare function={a(\x)=0.75*\x-2;},
+    declare function={b(\x)=0.75*\x-1;}
+]
+
+
+\begin{axis}[xtick=\empty, ytick=\empty, xlabel={Revenus}, ylabel={Endettement}]
+\myGlobalTransformation{0}{0};
+
+% pauvres
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x+2.5};
+
+%moyens
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=2:6]{rand+x};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=2:6]{rand+x+2.5};
+
+%riches
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=7:11]{rand+x};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=7:11]{rand+x+2.5};
+
+%frontière
+\addplot [white, very thick, domain=-3:11] {x+1.25};
+\end{axis}
+
+
+\end{tikzpicture}
+}
+
+\end{frame}
+
+
+
+\section{essai2}
+
+\begin{frame}
+\frametitle{\secname}
+
+\begin{tikzpicture}
+
+
+\begin{axis}[xtick=\empty, ytick=\empty, xlabel={Revenus}, ylabel={Endettement},domain=-3:1, enlargelimits=false,ymin=-3,ymax=6]
+\myGlobalTransformationbis{0}{0};
+
+% techniciens
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand-2};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand-4};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+2.5};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+4.5};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+6.5};
+
+%frontière
+\addplot [white, very thick, domain=-3:1] {1.25};
+\end{axis}
+
+
+
+
+
+\begin{axis}[xtick=\empty, ytick=\empty, xlabel={Revenus}, ylabel={Endettement},domain=-3:1, enlargelimits=false,ymin=-3,ymax=6]
+\myGlobalTransformationbis{0}{3};
+
+% cadres
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand-x};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand-x-2};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand-x-4};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand-x+2.5};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand-x+4.5};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand-x+6.5};
+
+%frontière
+\addplot [white, very thick, domain=-3:1] {-x+1.25};
+\end{axis}
+
+
+
+\begin{axis}[xtick=\empty, ytick=\empty, xlabel={Revenus}, ylabel={Endettement},domain=-3:1, enlargelimits=false,ymin=-3,ymax=6]
+\myGlobalTransformationbis{0}{6};
+
+% libérales
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x-2};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x-4};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x+2.5};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x+4.5};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x+6.5};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x+8.5};
+
+%frontière
+\addplot [white, very thick, domain=-3:1] {x+1.25};
+\end{axis}
+
+
+
+\end{tikzpicture}
+
+\end{frame}
+
+
+\end{document}
