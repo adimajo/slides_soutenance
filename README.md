@@ -14,15 +14,14 @@ Unité de recherche Équipe-projet MODAL
 
 
 Les codes nécessaires à l'obtention de la majorité des résultats sur données simulées / UCI sont disponibles dans ce repo.  
-Pour compiler les slides, il est nécessaire d'avoir [git](https://git-scm.com/), [arara](https://github.com/cereda/arara) (inclus dans la plupart des distributions TeX), et une [distribution TeX](https://www.latex-project.org/get/).
+Pour compiler les slides, il est nécessaire d'avoir [git](https://git-scm.com/) et une [distribution TeX](https://www.latex-project.org/get/).
 
+J'utilise la fonction "Quick Build" de mon éditeur TeXmaker avec la commande suivante :
 ```bash
-git clone https://github.com/adimajo/slides_soutenance.git
-cd slides_soutenance
-arara presentation -v
+"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|"biber" %|"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|"biber" %|"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|open %.pdf
 ```
 
-Le fichier `presentation.pdf` est ainsi obtenu dans le dossier `slides_soutenance`.
+Le fichier `soutenance.pdf` est ainsi obtenu dans le dossier `slides_soutenance`.
 
 **English version - French above**
 
@@ -38,18 +37,16 @@ Doctoral School Sciences pour l’Ingénieur
 University Department Équipe-projet MODAL
 
 The code to obtain all results on simulated / UCI data are made available in this repo.  
-To compile the manuscript, [git](https://git-scm.com/), [arara](https://github.com/cereda/arara) (included in lots of TeX distributions) and a [TeX distribution](https://www.latex-project.org/get/) are needed.
+To compile the slides, [git](https://git-scm.com/) and a [TeX distribution](https://www.latex-project.org/get/) are needed.
 
+I use the "Quick Build" function of TeXmaker with the following command:
 ```bash
-git clone https://github.com/adimajo/slides_soutenance.git
-cd slides_soutenance
-arara presentation -v
+"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|"biber" %|"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|"biber" %|"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|open %.pdf
 ```
 
-The file `presentation.pdf` should be visible in the `slides_soutenance` folder.
+The file `soutenance.pdf` should be visible in the `slides_soutenance` folder.
 
 ## Credits
 
-To build the pdf file, [arara](https://github.com/cereda/arara) is used (BSD Licence).
 To make sure LaTeX packages are not loaded but not used, I used the Python [LaTeXpkges script](https://github.com/TarasKuzyo/LaTeXpkges) (MIT Licence).  
 Feel free to clone / fork / star for your own work!
