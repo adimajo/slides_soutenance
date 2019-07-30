@@ -6,6 +6,7 @@
 
 }
 
+\usepackage{colortbl}
 \usepackage{cancel}
 \usepackage{multirow}
 \usepackage{graphicx}
@@ -40,15 +41,6 @@
 \usepackage{subcaption}
 \usepackage[backend=biber,bibencoding=utf8]{biblatex}
 \usepackage{animate}
-
-
-
-
-
-
-
-
-
 \usetikzlibrary{calc}
 \usetikzlibrary{hobby}
 \makeatletter % from https://tex.stackexchange.com/a/283273/121799
@@ -203,13 +195,6 @@ plot[variable=\x,domain=\angleD:{\angleA+360}] %
 \end{scope}
 }
 
-
-
-
-
-
-
-
 \definecolor{links}{HTML}{2A1B81}
 \hypersetup{colorlinks,linkcolor=,urlcolor=links}
 
@@ -251,7 +236,6 @@ yshift=-3ex,
 
 \addbibresource{biblio.bib}
 
-
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
 
@@ -286,12 +270,15 @@ yshift=-3ex,
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title[Credit Scoring]{Some thoughts about current\\ Credit Scoring practices}
+\title[Soutenance]{Modèles de classification supervisée \\ et semi-supervisée \\ {\small Contrôle des pertes d’information inhérentes au scoring en risque de crédit}}
 
-\author{Adrien Ehrhardt\\ AGOS Machine Learning Day}
+\author{Soutenance de thèse d'Adrien Ehrhardt \\ {\footnotesize
+Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
+}}
+
 \institute[CACF - Inria]
 
-\date{20/06/2019} % Date, can be changed to a custom date
+\date{Villeneuve d'Ascq, 30/09/2019} % Date, can be changed to a custom date
 
 \titlegraphic{%
     \includegraphics[width=2.5cm]{figures/inria.png}~%
@@ -366,6 +353,8 @@ yshift=-3ex,
 \newcommand{\nf}{\text{nf}}
 \newcommand{\yslant}{0.5}
 \newcommand{\xslant}{-0.6}
+\newcommand{\tr}{T}
+\newcommand{\bqk}{\bm{\mathfrak{q}}}
 
 \def\mybar#1#2#3{%%
 \begin{tabular}{@{}l@{}} {\scriptsize #1} \\ {\scriptsize #2} \\ {\scriptsize #3} \end{tabular} & \resizebox{.05#1\textwidth}{0.7cm}{\begin{tabular}{@{}l@{}}{\color{green}\rule[0pt]{#1bp}{10pt}} \\ {\color{orange}\rule[0pt]{#2bp}{10pt}} \\ {\color{red}\rule[0pt]{#3bp}{10pt}} \end{tabular}}}
@@ -483,7 +472,27 @@ yshift=-3ex,
 \end{table}
 }
 
-\only<8->{
+\only<8>{
+\begin{table}
+\centering
+\begin{tiny}
+\hspace*{-0.7cm}\begin{tabular}{p{2cm}|p{1.1cm}|p{1cm}|p{2.4cm}||p{0.6cm}|p{1cm}}
+\textcolor <4,6> {OliveGreen} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {OliveGreen} {\textbf<7>{Family status x Wages}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{Score}}} & Repayment \\
+\hline
+\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {OliveGreen} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{225}}} & 0  \\
+\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {OliveGreen} {\textbf<7>{Union x ]1500;2000]}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{190}}} & 1  \\
+\arrayrulecolor{OliveGreen}\hline
+\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {OliveGreen} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {OliveGreen} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{202}}} & 1  \\
+\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
+\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
+\end{tabular}
+\end{tiny}
+\caption{\label{tab:exemple} Dataset with outliers and missing values.}
+\end{table}
+}
+
+\only<9->{
 \begin{table}
 \centering
 \begin{tiny}
@@ -502,6 +511,7 @@ yshift=-3ex,
 \caption{\label{tab:exemple} Dataset with outliers and missing values.}
 \end{table}
 }
+
 \vspace{-0.5cm}
 \uncover<2->{
 \begin{enumerate}
@@ -526,306 +536,42 @@ Random variables: $\bm{X}, Y, Z$
 \bigskip
 
 \uncover<2->{
-Observations:
-
-$\bm{x} = (x_1, \dots, x_d)$: characteristics.
-
-$x_j \in \mathbb{R} $ or $\{1, \dots, l_j\}$: \textit{e.g.}\ rent amount, job, \dots
-
-$y \in \{0,1\}$: good or bad.
-
-$z \in \{\f,\nf\}$: financed or not financed.
+\begin{block}{Observations}
+\vspace*{-0.8cm}
+\begin{alignat*}{3}
+\bm{x} & = (x_1, \dots, x_d) && \text{characteristics,} \\
+x_j & \in \mathbb{R} \textit{ or } \{1, \dots, l_j\} \quad && \text{\textit{e.g.}\ rent amount, job, \dots,} \\
+y & \in \{0,1\} \quad && \text{good or bad,} \\
+z & \in \{\f,\nf\} \quad && \text{financed or not financed.}
+\end{alignat*}
+\vspace*{-0.6cm}
+\end{block}
 }
+
+%\bigskip
+%
+%\uncover<3->{
+%True distribution of good and bad clients: $p(y | \bm{x})$.
+%}
 
 \bigskip
 
 \uncover<3->{
-True distribution of good and bad clients: $p(y | \bm{x})$
-}
-
-\end{frame}
-
-
-
-
-\begin{frame}
-\frametitle{\secname: \subsecname}
-
-Need for a {\bf computable model} that resembles $p$, often in the form of a {\bf parametric} model $p_{\bm{\theta}}(y | \bm{x})$, which we can calculate for a new client.
-
-\medskip
-
-\uncover<2->{
-Example: logistic regression 
-\[ \ln \frac{p_{\bm{\theta}}(1 | \bm{x})}{(1 - p_{\bm{\theta}}(1 | \bm{x}))} = \bm{x}' \bm{\theta} \]
-}
-
-\medskip
-
-\uncover<3->{
-There is $\bm{\theta}^\star$ that makes $p_{\bm{\theta}^\star}$ ``close'' to $p$.
-
-$\bm{\theta}^\star = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}})] = \int_{\mathcal{X}} \sum_{y \in \{0,1\}} p(y | \bm{x}) \ln \dfrac{p(y | \bm{x})}{p_{\bm{\theta}}(y | \bm{x})}$.
-
-\begin{block}{Well-specified model assumption}
-$\mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}^\star})] = 0,$
-
-$p_{\bm{\theta}^\star}(y | \bm{x}) = p(y | \bm{x}).$
+\begin{block}{Samples}
+\vspace*{-0.8cm}
+\begin{alignat*}{3}
+\mathcal{T}_{\text{f}} & = (\bm{\mathbf{x}}_{\text{f}}, \bm{\mathbf{y}}_{\text{f}}, \bm{\mathbf{z}}_{\text{f}}) \quad && n \text{-sample of financed clients,} \\
+\mathcal{T}_{\text{nf}} & = (\bm{\mathbf{x}}_{\text{nf}}, \bm{\mathbf{z}}_{\text{nf}}) \quad && n' \text{-sample of not-financed clients,} \\
+\mathcal{T} & = \mathcal{T}_{\text{f}} \cup \mathcal{T}_{\text{nf}} \quad && \text{observed sample,} \\
+\mathcal{T}_{\text{c}} & = \mathcal{T} \cup \bm{\mathbf{y}}_{\text{nf}} \quad && \text{complete sample.}
+\end{alignat*}
+\vspace*{-0.6cm}
 \end{block}
 }
 
 \end{frame}
 
 
-
-
-
-\begin{frame}
-\frametitle{\secname: \subsecname}
-
-\begin{figure}
-\begin{center}
-\resizebox{0.8\textwidth}{4.7cm}{
-\begin{tikzpicture}[scale=1.1,every node/.style={minimum size=1cm},on grid]
-
-	% Real level
-	\begin{scope}[
-		yshift=-120,
-		every node/.append style={yslant=\yslant,xslant=\xslant},
-		yslant=\yslant,xslant=\xslant
-	] 
-		% The frame:
-		\draw[white, dashed, thin] (0,0) rectangle (7,7); 
-		% Agents:
-		\draw[fill=red]  
-			%(5,2) circle (.1) % Firms
-			(2,2) circle (.1); % Households
-		% Flows:
-		%\draw[-latex,thin, blue] 
-			%(2,2.2) to (2,4); % Labour Powers
-		%\draw[-latex,thin, blue]
-			%(4.85,1.85) to (4,1); % Wages
-		 % Labels:
-		\fill[white]
-			(0.5,6.5) node[right, scale=2.5] {Space $\Theta$}	
-			(2.1,1.9) node[below,scale=2]{$\bm{\theta}^\star$};
-
-	\end{scope}
-	
-	% 2 vertical lines for linking agents on the 2 levels
-	%\draw[thin, dashed, red](.8,1.75) to (3.8,-0.32);
-	\draw[thin, dashed, red](.8,1.75) to (.8,-1.8);
-	
-    % Draw right angle scheme
-    \draw(.8,-1.6) to (1,-1.6);
-    \draw(1,-1.6) to (1,-1.8);
-
-
-	% Monetary level
-	\begin{scope}[
-		yshift=-20,
-		every node/.append style={yslant=0,xslant=0},
-		yslant=\yslant,xslant=\xslant
-	]
-		 % Agents:
-		\draw [fill=olive]
-			(2,2) circle (.1); % Households
-		 % Labels:
-		\fill[black]
-			(2.2,2.4) node[right,scale=2]{\textcolor{olive}{$p(y|x)$}};
-        \fill[red]
-			(0.85,0.35) node [right, scale=1.5] {Model bias};	
-
-	\end{scope} 
-\end{tikzpicture}
-}
-\end{center}
-%\caption{\label{fig:projection} Vision géométrique du biais de modèle.}
-\end{figure}
-
-
-\end{frame}
-
-
-
-
-
-
-\begin{frame}
-\frametitle{\secname: \subsecname}
-
-$p$ is unknown: access to an i.i.d.\ $n+n'$-sample $\mathcal{T} = (\bm{x}_i, y_i, z_i)_1^{n+n'} \sim p$.
-
-\medskip
-
-\uncover<2->{
-We can deduce from the KL divergence the (log-)likelihood:
-\[ \ell(\bm{\theta} ; \mathcal{T}) = \sum_{i=1}^{n+n'} \ln p_{\bm{\theta}}(y_i | \bm{x}_i). \]
-}
-
-\medskip
-
-\uncover<3->{
-The MLE $\hat{\bm{\theta}} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathcal{T})$ is a good approximation of $\bm{\theta}^\star$.
-}
-
-\medskip
-
-\uncover<4->{
-Unfortunately, $\hat{\bm{\theta}}$ is not directly computable (no closed form solution).
-}
-
-\medskip
-
-\uncover<5->{
-\[ \tilde{\bm{\theta}} = \text{Newton-Raphson}(\ell(\bm{\theta} ; \mathcal{T})) \neq \hat{\bm{\theta}}. \]
-}
-
-\end{frame}
-
-
-\begin{frame}
-\frametitle{\secname: \subsecname}
-
-
-\begin{figure}
-\begin{center}
-\resizebox{0.8\textwidth}{4.7cm}{
-\begin{tikzpicture}[scale=1.1,every node/.style={minimum size=1cm},on grid]
-
-	% Real level
-	\begin{scope}[
-		yshift=-120,
-		every node/.append style={yslant=\yslant,xslant=\xslant},
-		yslant=\yslant,xslant=\xslant
-	] 
-		% The frame:
-		\draw[white, dashed, thin] (-0.5,-0.5) rectangle (6.5,6.5); 
-		% Agents:
-		\draw[fill=red]  
-			%(5,2) circle (.1) % Firms
-			(2,2) circle (.1); % Households
-		% Flows:
-		\draw[-latex,thin, blue] 
-			(2,2.2) to (2,4); % Labour Powers
-		\draw[-latex,thin, orange]
-			(2,4) to (1,5); % Wages
-		 % Labels:
-		\fill[white]
-			(0.2,6) node[right, scale=2.5] {Space $\Theta$}
-			(2.1,1.9) node[below,scale=2]{$\bm{\theta}^\star$}
-			(2.2,4.3) node [scale=2] {$\hat{\bm{\theta}}$} ;
-		\fill[blue]
-			(0.7,3) node [scale=1] {Bias and variance}
-            (0.5,2.7) node [scale=1] {of estimation};
-         \fill[orange]
-			(0.5,4.2) node [scale=1] {Comp.}
-			(0.5,3.8) node [scale=1] {precision};
-
-		%\fill[blue]
-			%(5.7,1.1) node [scale=1] {Estimation}
-           % (5.7,0.8) node [scale=1] {bias+variance};
-
-	\end{scope}
-	
-	% 2 vertical lines for linking agents on the 2 levels
-	%\draw[thin, dashed, red](.8,1.75) to (3.8,-0.32);
-	\draw[thin, dashed, red](.8,1.75) to (.8,-1.8);
-	
-    % Draw right angle scheme
-    \draw(.8,-1.6) to (1,-1.6);
-    \draw(1,-1.6) to (1,-1.8);
-
-
-	% Monetary level
-	\begin{scope}[
-		yshift=-20,
-		every node/.append style={yslant=0,xslant=0},
-		yslant=\yslant,xslant=\xslant
-	]
-		 % Agents:
-		\draw [fill=olive]
-			(2,2) circle (.1); % Households
-		 % Labels:
-		\fill[black]
-			(2.2,2.1) node[right,scale=2]{\textcolor{olive}{$p(y|x)$}};
-        \fill[red]
-			(0.85,0.35) node [right, scale=1.5] {Model bias};	
-
-	\end{scope} 
-\end{tikzpicture}
-}
-\end{center}
-%\caption{\label{fig:projection2} Vision géométrique du biais de modèle, biais et variance d'estimation.}
-\end{figure}
-
-All of this is ``hidden'' in your favourite statistical language / package / library but is essential to understanding Reject Inference.
-
-\end{frame}
-
-
-
-
-
-
-\subsection{Feature / model selection}
-
-\begin{frame}
-\frametitle{\secname: \subsecname}
-
-Up to now, we assumed a parameter space $\Theta$ {\bf fixed}.
-
-\medskip
-
-\uncover<2->{
-Comparing models = different parameter spaces $\Theta^1, \Theta^2, \dots$ 
-
-Corresponding to feature subsets, different discretizations, interactions, \dots since {\bf we don't know which parameter space is closest to the ``truth''} $p$.
-}
-
-\medskip
-
-\uncover<3->{
-\begin{block}{Model selection tools}
-\[ \hat{\bm{\theta}}^{\text{best}} = \argmin_{\hat{\bm{\theta}}^k \in \Theta^k} \text{BIC}(\hat{\bm{\theta}}^k) = - 2\ell(\hat{\bm{\theta}}^k, \mathcal{T}) + \text{dim}(\Theta^k) \ln n .\]
-\end{block}
-}
-
-\medskip
-
-\uncover<4->{
-BIC has nice statistical properties (consistency) but can be swapped in the entire presentation with your favourite model selection tool like Gini on $\mathcal{T}^{\text{test}}$.
-}
-
-\end{frame}
-
-
-
-
-
-\section{Reject Inference}
-
-\subsection{Industrial setting}
-
-\begin{frame}
-\frametitle{\secname: \subsecname}
-
-\begin{figure}[ht]
-\begin{minipage}[b]{0.45\linewidth}
-\center \includegraphics[width=5cm]{figures/schema.png}
-\caption{Simplified Acceptance mechanism in~Crédit Agricole Consumer Finance}
-\label{fig:figure1}
-
-\end{minipage}%
-\hfil \begin{minipage}[b]{0.5\linewidth}
-
-\center \includegraphics[width=5cm]{figures/camembert_invert.png}
-\caption{Proportion of ``final'' lending decisions for CACF France}
-
-\end{minipage}
-\end{figure}
-
-\end{frame}
 
 
 \begin{frame}
@@ -889,15 +635,303 @@ y_n \tikzmarkend{e4} \\
 \\
 \textcolor{white}{\bigg).} \end{array}
 \]
- 
-  
+
 \setbeamercolor{normal text}{fg=white}
 \usebeamercolor[fg]{normal text}
 
+\medskip
 
+\uncover<2->{
+%Need for a {\bf computable model} that resembles $p$, often in the form of a {\bf parametric} model $p_{\bm{\theta}}(y | \bm{x})$, which we can calculate for a new client.
+\textit{Credit Scoring} aims at estimating $p(y | \bm{x})$ in the form of a simple {\bf parametric} model $p_{\bm{\theta}}(y | \bm{x})$ such as logistic regression:
+}
+
+\medskip
+
+\uncover<3->{
+%Example: logistic regression 
+\[ \ln \frac{p_{\bm{\theta}}(1 | \bm{x})}{(1 - p_{\bm{\theta}}(1 | \bm{x}))} = (1,\bm{x})' \bm{\theta}. \]
+}
+
+%\medskip
+%
+%\uncover<3->{
+%There is $\bm{\theta}^\star$ that makes $p_{\bm{\theta}^\star}$ ``close'' to $p$.
+%
+%$\bm{\theta}^\star = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}})] = \int_{\mathcal{X}} \sum_{y \in \{0,1\}} p(y | \bm{x}) \ln \dfrac{p(y | \bm{x})}{p_{\bm{\theta}}(y | \bm{x})}$.
+%
+%\begin{block}{Well-specified model assumption}
+%$\mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}^\star})] = 0,$
+%
+%$p_{\bm{\theta}^\star}(y | \bm{x}) = p(y | \bm{x}).$
+%\end{block}
+%}
+
+\end{frame}
+
+
+%\subsection{Estimation}
+%\begin{frame}
+%\frametitle{\secname: \subsecname}
+%
+%\end{frame}
+
+
+
+
+%\begin{frame}
+%\frametitle{\secname: \subsecname}
+%
+%\begin{figure}
+%\begin{center}
+%\resizebox{0.8\textwidth}{4.7cm}{
+%\begin{tikzpicture}[scale=1.1,every node/.style={minimum size=1cm},on grid]
+%
+%	% Real level
+%	\begin{scope}[
+%		yshift=-120,
+%		every node/.append style={yslant=\yslant,xslant=\xslant},
+%		yslant=\yslant,xslant=\xslant
+%	] 
+%		% The frame:
+%		\draw[white, dashed, thin] (0,0) rectangle (7,7); 
+%		% Agents:
+%		\draw[fill=red]  
+%			%(5,2) circle (.1) % Firms
+%			(2,2) circle (.1); % Households
+%		% Flows:
+%		%\draw[-latex,thin, blue] 
+%			%(2,2.2) to (2,4); % Labour Powers
+%		%\draw[-latex,thin, blue]
+%			%(4.85,1.85) to (4,1); % Wages
+%		 % Labels:
+%		\fill[white]
+%			(0.5,6.5) node[right, scale=2.5] {Space $\Theta$}	
+%			(2.1,1.9) node[below,scale=2]{$\bm{\theta}^\star$};
+%
+%	\end{scope}
+%	
+%	% 2 vertical lines for linking agents on the 2 levels
+%	%\draw[thin, dashed, red](.8,1.75) to (3.8,-0.32);
+%	\draw[thin, dashed, red](.8,1.75) to (.8,-1.8);
+%	
+%    % Draw right angle scheme
+%    \draw(.8,-1.6) to (1,-1.6);
+%    \draw(1,-1.6) to (1,-1.8);
+%
+%
+%	% Monetary level
+%	\begin{scope}[
+%		yshift=-20,
+%		every node/.append style={yslant=0,xslant=0},
+%		yslant=\yslant,xslant=\xslant
+%	]
+%		 % Agents:
+%		\draw [fill=olive]
+%			(2,2) circle (.1); % Households
+%		 % Labels:
+%		\fill[black]
+%			(2.2,2.4) node[right,scale=2]{\textcolor{olive}{$p(y|x)$}};
+%        \fill[red]
+%			(0.85,0.35) node [right, scale=1.5] {Model bias};	
+%
+%	\end{scope} 
+%\end{tikzpicture}
+%}
+%\end{center}
+%%\caption{\label{fig:projection} Vision géométrique du biais de modèle.}
+%\end{figure}
+%
+%
+%\end{frame}
+
+
+
+
+
+
+%\begin{frame}
+%\frametitle{\secname: \subsecname}
+%
+%$p$ is unknown: access to an i.i.d.\ $n+n'$-sample $\mathcal{T} = (\bm{x}_i, y_i, z_i)_1^{n+n'} \sim p$.
+%
+%\medskip
+%
+%\uncover<2->{
+%We can deduce from the KL divergence the (log-)likelihood:
+%\[ \ell(\bm{\theta} ; \mathcal{T}) = \sum_{i=1}^{n+n'} \ln p_{\bm{\theta}}(y_i | \bm{x}_i). \]
+%}
+%
+%\medskip
+%
+%\uncover<3->{
+%The MLE $\hat{\bm{\theta}} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathcal{T})$ is a good approximation of $\bm{\theta}^\star$.
+%}
+%
+%\medskip
+%
+%\uncover<4->{
+%Unfortunately, $\hat{\bm{\theta}}$ is not directly computable (no closed form solution).
+%}
+%
+%\medskip
+%
+%\uncover<5->{
+%\[ \tilde{\bm{\theta}} = \text{Newton-Raphson}(\ell(\bm{\theta} ; \mathcal{T})) \neq \hat{\bm{\theta}}. \]
+%}
+%
+%\end{frame}
+%
+%
+%\begin{frame}
+%\frametitle{\secname: \subsecname}
+%
+%
+%\begin{figure}
+%\begin{center}
+%\resizebox{0.8\textwidth}{4.7cm}{
+%\begin{tikzpicture}[scale=1.1,every node/.style={minimum size=1cm},on grid]
+%
+%	% Real level
+%	\begin{scope}[
+%		yshift=-120,
+%		every node/.append style={yslant=\yslant,xslant=\xslant},
+%		yslant=\yslant,xslant=\xslant
+%	] 
+%		% The frame:
+%		\draw[white, dashed, thin] (-0.5,-0.5) rectangle (6.5,6.5); 
+%		% Agents:
+%		\draw[fill=red]  
+%			%(5,2) circle (.1) % Firms
+%			(2,2) circle (.1); % Households
+%		% Flows:
+%		\draw[-latex,thin, blue] 
+%			(2,2.2) to (2,4); % Labour Powers
+%		\draw[-latex,thin, orange]
+%			(2,4) to (1,5); % Wages
+%		 % Labels:
+%		\fill[white]
+%			(0.2,6) node[right, scale=2.5] {Space $\Theta$}
+%			(2.1,1.9) node[below,scale=2]{$\bm{\theta}^\star$}
+%			(2.2,4.3) node [scale=2] {$\hat{\bm{\theta}}$} ;
+%		\fill[blue]
+%			(0.7,3) node [scale=1] {Bias and variance}
+%            (0.5,2.7) node [scale=1] {of estimation};
+%         \fill[orange]
+%			(0.5,4.2) node [scale=1] {Comp.}
+%			(0.5,3.8) node [scale=1] {precision};
+%
+%		%\fill[blue]
+%			%(5.7,1.1) node [scale=1] {Estimation}
+%           % (5.7,0.8) node [scale=1] {bias+variance};
+%
+%	\end{scope}
+%	
+%	% 2 vertical lines for linking agents on the 2 levels
+%	%\draw[thin, dashed, red](.8,1.75) to (3.8,-0.32);
+%	\draw[thin, dashed, red](.8,1.75) to (.8,-1.8);
+%	
+%    % Draw right angle scheme
+%    \draw(.8,-1.6) to (1,-1.6);
+%    \draw(1,-1.6) to (1,-1.8);
+%
+%
+%	% Monetary level
+%	\begin{scope}[
+%		yshift=-20,
+%		every node/.append style={yslant=0,xslant=0},
+%		yslant=\yslant,xslant=\xslant
+%	]
+%		 % Agents:
+%		\draw [fill=olive]
+%			(2,2) circle (.1); % Households
+%		 % Labels:
+%		\fill[black]
+%			(2.2,2.1) node[right,scale=2]{\textcolor{olive}{$p(y|x)$}};
+%        \fill[red]
+%			(0.85,0.35) node [right, scale=1.5] {Model bias};	
+%
+%	\end{scope} 
+%\end{tikzpicture}
+%}
+%\end{center}
+%%\caption{\label{fig:projection2} Vision géométrique du biais de modèle, biais et variance d'estimation.}
+%\end{figure}
+%
+%All of this is ``hidden'' in your favourite statistical language / package / library but is essential to understanding Reject Inference.
+%
+%\end{frame}
+%
+%
+%
+%
+%
+%
+%\subsection{Feature / model selection}
+%
+%\begin{frame}
+%\frametitle{\secname: \subsecname}
+%
+%Up to now, we assumed a parameter space $\Theta$ {\bf fixed}.
+%
+%\medskip
+%
+%\uncover<2->{
+%Comparing models = different parameter spaces $\Theta^1, \Theta^2, \dots$ 
+%
+%Corresponding to feature subsets, different discretizations, interactions, \dots since {\bf we don't know which parameter space is closest to the ``truth''} $p$.
+%}
+%
+%\medskip
+%
+%\uncover<3->{
+%\begin{block}{Model selection tools}
+%\[ \hat{\bm{\theta}}^{\text{best}} = \argmin_{\hat{\bm{\theta}}^k \in \Theta^k} \text{BIC}(\hat{\bm{\theta}}^k) = - 2\ell(\hat{\bm{\theta}}^k, \mathcal{T}) + \text{dim}(\Theta^k) \ln n .\]
+%\end{block}
+%}
+%
+%\medskip
+%
+%\uncover<4->{
+%BIC has nice statistical properties (consistency) but can be swapped in the entire presentation with your favourite model selection tool like Gini on $\mathcal{T}^{\text{test}}$.
+%}
+%
+%\end{frame}
+
+
+
+
+
+\section{Reject Inference}
+
+\subsection{Industrial setting}
+
+\begin{frame}
+\frametitle{\secname: \subsecname}
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.45\linewidth}
+\center \includegraphics[width=5cm]{figures/schema.png}
+\caption{Simplified Acceptance mechanism in~Crédit Agricole Consumer Finance}
+\label{fig:figure1}
+
+\end{minipage}%
+\hfil \begin{minipage}[b]{0.5\linewidth}
+
+\center \includegraphics[width=5cm]{figures/camembert_invert.png}
+\caption{Proportion of ``final'' lending decisions for CACF France}
+
+\end{minipage}
+\end{figure}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{\secname: \subsecname}
 
 We traditionally build a logistic regression using only financed clients ({\bf fixed parameter space $\Theta$}):
-\[ \hat{\bm{\theta}}_{\f} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathcal{T}_\f), \]
+\[ \hat{\bm{\theta}}_{\f} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathcal{T}_\f) = \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i | \bm{x}_i), \]
 which asymptotically approximates:
 \[ \bm{\theta}_{\f}^\star = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}}) | Z = \f]. \]
 
@@ -911,9 +945,12 @@ which asymptotically approximates:
 We wish we had:
 \[ \hat{\bm{\theta}} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathbf{x}, \mathbf{y}), \]
 which asymptotically approximates:
-\[ \bm{\theta}^\star = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}})]. \]
+\begin{align*}
+\bm{\theta}^\star & = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}})] \\
+& = \argmax_{\bm{\theta} \in \bm{\Theta}} \mathbb{E}_{\bm{x}, y \sim p} [\ln p_{\bm{\theta}}(y | \bm{x})].
+\end{align*}
 But we lack $\mathbf{y}_{\nf}$.
-
+\vspace*{-0.8cm}
 \begin{center}
 \resizebox{0.8\textwidth}{4.7cm}{
 \begin{tikzpicture}[scale=1.1,every node/.style={minimum size=1cm},on grid]
@@ -986,45 +1023,28 @@ But we lack $\mathbf{y}_{\nf}$.
 
 
 
-\subsection{What is at stake?}
+\subsection{Modelling the financing mechanism}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
-\uncover<1->{
-\textbf{Estimators :}
 
-\begin{enumerate}
-\only<1>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
-\only<2>{\item ‘‘Oracle'': $\textcolor{red}{\sqrt[]{n+n'}} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
-\only<3>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \textcolor{red}{\bm{\theta}^\star} ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
-\only<4>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\bm{\theta}^\star}})$}
-\only<5->{\item ‘‘Oracle'': $\textcolor{red}{\sqrt[]{n+n'}} ( \hat{\bm{\theta}} - \textcolor{red}{\bm{\theta}^\star} ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\bm{\theta}^\star}})$}
-
-\only<1>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
-\only<2>{\item Current methodology: $ \textcolor{red}{\sqrt[]{n}} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
-\only<3>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \textcolor{red}{\bm{\theta}^\star_{\f}} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
-\only<4>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\f,\bm{\theta}^\star_{\f}}})$}
-\only<5->{\item Current methodology: $ \textcolor{red}{\sqrt[]{n}} ( \hat{\bm{\theta}}_{\f} - \textcolor{red}{\bm{\theta}^\star_{\f}} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\f,\bm{\theta}^\star_{\f}}})$}
-
-\end{enumerate}
-}
-
-\bigskip
-
-\bigskip
-
-\uncover<5->{
-\textbf{\textcolor{red}{Question 1} :} asymptotics of the estimators
-
-\centering{\fbox{(Q1) $ {\bm{\theta}}^\star \stackrel{?}{=} {{\bm{\theta}}}^\star_{\f} $}}
-
-\fbox{(Q2) \centering{${\Sigma}_{\bm{\theta}^\star} \stackrel{?}{=} {\Sigma}_{\f,\bm{\theta}^\star_{\f}} $}}
-
-}
+modèle de financement
+modèle "gamma"
+algorithme EM
 
 \end{frame}
 
-%----------------------------------------------------------------------------------------
+
+
+
+\subsection{hypothèses}
+
+\begin{frame}
+\frametitle{\secname : \subsecname}
+
+
+\end{frame}
+
 
 \subsection*{Missingness mechanism}
 
@@ -1068,108 +1088,177 @@ edges
 
 \end{frame}
 
-%----------------------------------------------------------------------------------------
 
-\subsection*{Model specification}
+
+\subsection{remarques sur la sélection de modèles}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-\begin{itemize}
-\item \textbf{Well-specified model} : $p(y|\bm{x}) = p_{\bm{\theta}^\star}(y|\bm{x})$.
 
-$\rightarrow$ With real data $\Rightarrow$ hypothesis unlikely to be true.
-\item \textbf{Misspecified model} : $\bm{\theta}^\star$ is the ``best'' in the $\Theta$ family.
+\end{frame}
 
-$\rightarrow$ Logistic regression commonly used for its robustness to misspecification (no assumption about $p(\bm{x})$).
-\end{itemize}
 
-\footnotesize{
-\begin{table}[ht]
-\begin{tabular}{|R{3.4cm}||C{2cm}|C{2cm}|}
-\hline \backslashbox{$p_{\bm{\theta}}(y|\bm{x})$}{$p(z|\bm{x},y)$} & MAR & MNAR \\
-\hline
-\hline \multirow{2}{*}{Well specified} & $\textcolor{olive}{\bm{\theta}^\star_{\f} = \bm{\theta}^\star}$ &  \\ 
-  & ${\Sigma}_{\f,\bm{\theta}^\star_{\f}} \neq {\Sigma}_{\theta^\star}$ & \textcolor{red}{$\bm{\theta}^\star_{\f} \neq \bm{\theta}^\star$} \\ \cline{1-2}
- \multirow{2}{*}{Misspecified} & \textcolor{red}{$\bm{\theta}^\star_{\f} \neq \bm{\theta}^\star$} & \textcolor{red}{${\Sigma}_{\f,\bm{\theta}^\star_{\f}} \neq {\Sigma}_{\theta^\star}$} \\
- & \textcolor{red}{${\Sigma}_{\f,\bm{\theta}^\star_{\f}} \neq {\Sigma}_{\theta^\star}$} &  \\
-\hline 
-\end{tabular}
-\label{tableasymptotic}
-\caption{(Q1) and (Q2) w.r.t. model specification and missingness mechanism}
-\end{table}
+
+\subsection{stratégies de réintégration de refusés}
+
+\begin{frame}
+\frametitle{\secname : \subsecname}
+
+6 stratégies, donner l'essence
+
+\end{frame}
+
+
+\subsection{What is at stake?}
+
+\begin{frame}
+\frametitle{\secname : \subsecname}
+\textbf{Estimators :}
+
+\hspace*{-0.2cm}\begin{alignat*}{6}
+& \text{``Oracle'':} & \sqrt[]{n+n'} && ( \hat{\bm{\theta}} - \bm{\theta}^\star ) &&& \xrightarrow[n,n' \to \infty]{\mathcal{L}} &&& \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star}) \\
+& \text{Current methodology:} & \sqrt[]{n} && ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) &&& \xrightarrow[n \to \infty]{\mathcal{L}} &&& \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})
+\end{alignat*}
+
+%\begin{enumerate}
+%\only<1>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
+%\only<2>{\item ‘‘Oracle'': $\textcolor{red}{\sqrt[]{n+n'}} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
+%\only<3>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \textcolor{red}{\bm{\theta}^\star} ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
+%\only<4>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\bm{\theta}^\star}})$}
+%\only<5->{\item ‘‘Oracle'': $\textcolor{red}{\sqrt[]{n+n'}} ( \hat{\bm{\theta}} - \textcolor{red}{\bm{\theta}^\star} ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\bm{\theta}^\star}})$}
+%
+%\only<1>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
+%\only<2>{\item Current methodology: $ \textcolor{red}{\sqrt[]{n}} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
+%\only<3>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \textcolor{red}{\bm{\theta}^\star_{\f}} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
+%\only<4>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\f,\bm{\theta}^\star_{\f}}})$}
+%\only<5->{\item Current methodology: $ \textcolor{red}{\sqrt[]{n}} ( \hat{\bm{\theta}}_{\f} - \textcolor{red}{\bm{\theta}^\star_{\f}} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\f,\bm{\theta}^\star_{\f}}})$}
+%
+%\end{enumerate}
+
+\bigskip
+
+\bigskip
+
+\uncover<5->{
+\textbf{\textcolor{red}{Question 1} :} asymptotics of the estimators
+
+{\centering{\fbox{(Q1) $ {\bm{\theta}}^\star \stackrel{?}{=} {{\bm{\theta}}}^\star_{\f} $}}}
+
+%\fbox{(Q2) \centering{${\Sigma}_{\bm{\theta}^\star} \stackrel{?}{=} {\Sigma}_{\f,\bm{\theta}^\star_{\f}} $}}
+
+}
+
+\uncover<6->{
+\textbf{\textcolor{red}{Question 2} :} bla
 }
 
 \end{frame}
 
 %----------------------------------------------------------------------------------------
 
-\subsection{How to use $\mathbf{x}_{\nf}$?}
 
-\begin{frame}
-\frametitle{\secname : \subsecname}
 
-\uncover<1->{
-\textbf{\textcolor{red}{Question 2}:} How to construct a better estimator than $\hat{\bm{\theta}}_{\f}$?
-}
+%----------------------------------------------------------------------------------------
 
-\bigskip
-
-\bigskip
-
-\uncover<2->{
-\textbf{\textcolor{red}{Scope for action}:}
-}
-\begin{itemize}
-\only<2-5>{\item Change model space $\Theta$,}
-\only<6->{\item \sout{Change model space $\Theta$} logistic regression,}
-\only<3-6>{\item Model acceptance/rejection process (i.e. $p_{\gamma}(z|\bm{x},y)$),}
-\only<7->{\item \sout{Model acceptance/rejection process (i.e. $p_{\gamma}(z|\bm{x},y)$)}
-
-$\gamma$ cannot be estimated,}
-\item<4-> Use $\mathbf{x}_{\nf}$.
-\end{itemize}
-
-\only<5>{
-\begin{block}{Natural way to achieve all three: generative approach}
-\setlength\abovedisplayskip{-5pt}
-\begin{flalign*}
-& \hspace{0.4cm} {p_{\textcolor{red}{\alpha}}(\bm{x},y,z) = p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}) p_{\theta_{\textcolor{red}{\alpha}}}(y|x) p_{\gamma_{\textcolor{red}{\alpha}}}(z|\bm{x},y).} &
-\end{flalign*}
-\begin{alignat*}{2}
-& (\fbox{$\hat{\theta}_{\textcolor{red}{\alpha}}$},\hat{\beta}_{\textcolor{red}{\alpha}},\hat{\gamma}_{\textcolor{red}{\alpha}}) && = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \ell({\textcolor{red}{\alpha}};\bm{x},\bm{y}_{\f}) = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \sum_{i=1}^{n }\ln(p_{\theta_{\textcolor{red}{\alpha}}}(y_i|x_i)) \\
-& && + \sum_{i=1}^{n+n'} \ln(p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}_i)) \left( + \sum_{i=1}^{n} \ln(p_{\gamma_{\textcolor{red}{\alpha}}}(z_i|x_i,y_i)) \right).
-\end{alignat*}
-\end{block}
-}
-\only<6>{
-\begin{block}{\sout{Natural way to achieve all three: generative approach}}
-\setlength\abovedisplayskip{-5pt}
-\begin{flalign*}
-& \hspace{0.4cm} {p_{\textcolor{red}{\alpha}}(\bm{x},y,z) = p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}) p_{\theta_{\textcolor{red}{\alpha}}}(y|\bm{x}) p_{\gamma_{\textcolor{red}{\alpha}}}(z|\bm{x},y).} &
-\end{flalign*}
-\begin{alignat*}{2}
-& (\fbox{$\hat{\theta}_{\textcolor{red}{\alpha}}$},\hat{\beta}_{\textcolor{red}{\alpha}},\hat{\gamma}_{\textcolor{red}{\alpha}}) && = \argmax_{\textcolor{red}{\alpha}} \ell({\textcolor{red}{\alpha}};\bm{x},\bm{y}_{\f}) = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \sum_{i=1}^{n}\ln(p_{\theta_{\textcolor{red}{\alpha}}}(y_i|x_i)) \\
-& && + \sum_{i=1}^{n+n'} \ln(p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}_i)) \left( + \sum_{i=1}^{n} \ln(p_{\gamma_{\textcolor{red}{\alpha}}}(z_i|x_i,y_i)) \right).
-\end{alignat*}
-\end{block}
-}
-
-\uncover<8->{
-%\begin{tikzpicture}
-%\coordinate (A) at (-1,1);
-%\coordinate (B) at (3,0.5);
-%\coordinate (C) at (4,-1);
-%\coordinate (D) at (1,-1);
-%\foreach \p in {A,B,C,D}
-%{\draw[fill=white] (\p) circle (1pt);}
-%\DrawPotato[blue,fill=red]{A}{B}{C}{D}
-%\end{tikzpicture}
-
-{\bf Remember} that $\mathcal{T}^{\text{OOT}}$ also comes from $p(y | \bm{x}, \f)$ such that applying a \textit{Reject Inference} method and getting a higher Gini is no guarantee that it would on the Through-the-Door population (on the contrary!).
-}
-
-\end{frame}
+%\subsection*{Model specification}
+%
+%\begin{frame}
+%\frametitle{\secname : \subsecname}
+%
+%\begin{itemize}
+%\item \textbf{Well-specified model} : $p(y|\bm{x}) = p_{\bm{\theta}^\star}(y|\bm{x})$.
+%
+%$\rightarrow$ With real data $\Rightarrow$ hypothesis unlikely to be true.
+%\item \textbf{Misspecified model} : $\bm{\theta}^\star$ is the ``best'' in the $\Theta$ family.
+%
+%$\rightarrow$ Logistic regression commonly used for its robustness to misspecification (no assumption about $p(\bm{x})$).
+%\end{itemize}
+%
+%\footnotesize{
+%\begin{table}[ht]
+%\begin{tabular}{|R{3cm}||C{2cm}|C{2cm}|}
+%\hline \backslashbox{$p_{\bm{\theta}}(y|\bm{x})$}{$p(z|\bm{x},y)$} & MAR & MNAR \\
+%\hline
+%\hline Well specified & $\textcolor{olive}{\bm{\theta}^\star_{\f} = \bm{\theta}^\star}$ & \multirow{2}{*}{\textcolor{red}{$\bm{\theta}^\star_{\f} \neq \bm{\theta}^\star$}} \\ \cline{1-2}
+% Misspecified & \textcolor{red}{$\bm{\theta}^\star_{\f} \neq \bm{\theta}^\star$} & \\
+%\hline 
+%\end{tabular}
+%\label{tableasymptotic}
+%\caption{(Q1) w.r.t. model specification and missingness mechanism}
+%\end{table}
+%}
+%
+%\end{frame}
+%
+%%----------------------------------------------------------------------------------------
+%
+%\subsection{How to use $\mathbf{x}_{\nf}$?}
+%
+%\begin{frame}
+%\frametitle{\secname : \subsecname}
+%
+%\uncover<1->{
+%\textbf{\textcolor{red}{Question 2}:} How to construct a better estimator than $\hat{\bm{\theta}}_{\f}$?
+%}
+%
+%\bigskip
+%
+%\bigskip
+%
+%\uncover<2->{
+%\textbf{\textcolor{red}{Scope for action}:}
+%}
+%\begin{itemize}
+%\only<2-5>{\item Change model space $\Theta$,}
+%\only<6->{\item \sout{Change model space $\Theta$} logistic regression,}
+%\only<3-6>{\item Model acceptance/rejection process (i.e. $p_{\gamma}(z|\bm{x},y)$),}
+%\only<7->{\item \sout{Model acceptance/rejection process (i.e. $p_{\gamma}(z|\bm{x},y)$)}
+%
+%$\gamma$ cannot be estimated,}
+%\item<4-> Use $\mathbf{x}_{\nf}$.
+%\end{itemize}
+%
+%\only<5>{
+%\begin{block}{Natural way to achieve all three: generative approach}
+%\setlength\abovedisplayskip{-5pt}
+%\begin{flalign*}
+%& \hspace{0.4cm} {p_{\textcolor{red}{\alpha}}(\bm{x},y,z) = p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}) p_{\theta_{\textcolor{red}{\alpha}}}(y|x) p_{\gamma_{\textcolor{red}{\alpha}}}(z|\bm{x},y).} &
+%\end{flalign*}
+%\begin{alignat*}{2}
+%& (\fbox{$\hat{\theta}_{\textcolor{red}{\alpha}}$},\hat{\beta}_{\textcolor{red}{\alpha}},\hat{\gamma}_{\textcolor{red}{\alpha}}) && = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \ell({\textcolor{red}{\alpha}};\bm{x},\bm{y}_{\f}) = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \sum_{i=1}^{n }\ln(p_{\theta_{\textcolor{red}{\alpha}}}(y_i|x_i)) \\
+%& && + \sum_{i=1}^{n+n'} \ln(p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}_i)) \left( + \sum_{i=1}^{n} \ln(p_{\gamma_{\textcolor{red}{\alpha}}}(z_i|x_i,y_i)) \right).
+%\end{alignat*}
+%\end{block}
+%}
+%\only<6>{
+%\begin{block}{\sout{Natural way to achieve all three: generative approach}}
+%\setlength\abovedisplayskip{-5pt}
+%\begin{flalign*}
+%& \hspace{0.4cm} {p_{\textcolor{red}{\alpha}}(\bm{x},y,z) = p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}) p_{\theta_{\textcolor{red}{\alpha}}}(y|\bm{x}) p_{\gamma_{\textcolor{red}{\alpha}}}(z|\bm{x},y).} &
+%\end{flalign*}
+%\begin{alignat*}{2}
+%& (\fbox{$\hat{\theta}_{\textcolor{red}{\alpha}}$},\hat{\beta}_{\textcolor{red}{\alpha}},\hat{\gamma}_{\textcolor{red}{\alpha}}) && = \argmax_{\textcolor{red}{\alpha}} \ell({\textcolor{red}{\alpha}};\bm{x},\bm{y}_{\f}) = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \sum_{i=1}^{n}\ln(p_{\theta_{\textcolor{red}{\alpha}}}(y_i|x_i)) \\
+%& && + \sum_{i=1}^{n+n'} \ln(p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}_i)) \left( + \sum_{i=1}^{n} \ln(p_{\gamma_{\textcolor{red}{\alpha}}}(z_i|x_i,y_i)) \right).
+%\end{alignat*}
+%\end{block}
+%}
+%
+%\uncover<8->{
+%%\begin{tikzpicture}
+%%\coordinate (A) at (-1,1);
+%%\coordinate (B) at (3,0.5);
+%%\coordinate (C) at (4,-1);
+%%\coordinate (D) at (1,-1);
+%%\foreach \p in {A,B,C,D}
+%%{\draw[fill=white] (\p) circle (1pt);}
+%%\DrawPotato[blue,fill=red]{A}{B}{C}{D}
+%%\end{tikzpicture}
+%
+%{\bf Remember} that $\mathcal{T}^{\text{OOT}}$ also comes from $p(y | \bm{x}, \f)$ such that applying a \textit{Reject Inference} method and getting a higher Gini is no guarantee that it would on the Through-the-Door population (on the contrary!).
+%}
+%
+%\end{frame}
 
 
 
@@ -1271,38 +1360,38 @@ For logistic regression, \textit{Reject Inference} methods amount to:
 
 
  
-\subsection{Additional remarks} 
- 
-\begin{frame}
-\frametitle{\secname: \subsecname}
-
-\begin{animateinline}[autoplay,loop]{2}%
-{\color{red}{\bf WARNING}}%
-\newframe \end{animateinline}
-
-\medskip
-
-All this stands for logistic regression and all ``local'' methods~\cite{zadrozny2004learning}.
-
-\medskip
-
-All ``global'' methods (explicit or implicit modelling of $p(\bm{x})$) will produce biased estimates under MAR.
-
-\medskip
-
-We might have:
-
-\begin{table}[t]
-\centering
-\begin{tabular}{l || l | l}
-Gini & Logistic regression & Decision trees \\
-\hline
-Financed & 40 & 45 \\
-\textcolor{red}{Through-the-door} & 40 & 35 \\
-\end{tabular}
-\end{table}
-
-\end{frame}
+%\subsection{Additional remarks} 
+% 
+%\begin{frame}
+%\frametitle{\secname: \subsecname}
+%
+%\begin{animateinline}[autoplay,loop]{2}%
+%{\color{red}{\bf WARNING}}%
+%\newframe \end{animateinline}
+%
+%\medskip
+%
+%All this stands for logistic regression and all ``local'' methods~\cite{zadrozny2004learning}.
+%
+%\medskip
+%
+%All ``global'' methods (explicit or implicit modelling of $p(\bm{x})$) will produce biased estimates under MAR.
+%
+%\medskip
+%
+%We might have:
+%
+%\begin{table}[t]
+%\centering
+%\begin{tabular}{l || l | l}
+%Gini & Logistic regression & Decision trees \\
+%\hline
+%Financed & 40 & 45 \\
+%\textcolor{red}{Through-the-door} & 40 & 35 \\
+%\end{tabular}
+%\end{table}
+%
+%\end{frame}
 
 
 
@@ -1320,9 +1409,9 @@ Financed & 40 & 45 \\
 \frametitle{\secname: \subsecname}
 
 \begin{figure}[!ht]
-\begin{animateinline}[poster=first, controls=all, palindrome, autopause, autoresume, width=\textwidth, height=6cm]{3}
-\multiframe{99}{i=2+1}{\input{CODE_FIGURES/EXAMPLE_DISC/disc_plot\i.tex}}%
-\end{animateinline}
+%\begin{animateinline}[poster=first, controls=all, palindrome, autopause, autoresume, width=\textwidth, height=6cm]{3}
+%\multiframe{99}{i=2+1}{\input{CODE_FIGURES/EXAMPLE_DISC/disc_plot\i.tex}}%
+%\end{animateinline}
 \end{figure}
 
 \end{frame}
@@ -1334,18 +1423,18 @@ Financed & 40 & 45 \\
 \begin{frame}[allowframebreaks]
 \frametitle{\subsecname}
 
-\begin{block}{Raw data}
-\vspace*{-0.9cm}
-\begin{align*}
-\bx & =(x_1,\dots,x_d) \\
-x_j & \in \mathbb{R} \text{ (continuous case)} \\
-x_j & \in \{1,\dots,l_j\} \text{ (categorical case)} \\
-y & \in \{0,1\} \text{ (target)}
-\end{align*}
-\vspace*{-0.7cm}
-\end{block}
-
-\bigskip
+%\begin{block}{Raw data}
+%\vspace*{-0.9cm}
+%\begin{align*}
+%\bx & =(x_1,\dots,x_d) \\
+%x_j & \in \mathbb{R} \text{ (continuous case)} \\
+%x_j & \in \{1,\dots,l_j\} \text{ (categorical case)} \\
+%y & \in \{0,1\} \text{ (target)}
+%\end{align*}
+%\vspace*{-0.7cm}
+%\end{block}
+%
+%\bigskip
 
 \begin{block}{Quantized data}
 \vspace*{-0.9cm}
@@ -1356,6 +1445,10 @@ y & \in \{0,1\} \text{ (target)}
 \end{align*}
 \vspace*{-0.7cm}
 \end{block}
+
+\begin{animateinline}[autoplay,loop]{2}%
+{\color{red}{\bf Huge cardinality!}}%
+\newframe \end{animateinline}
 
 \pagebreak
 
@@ -1437,7 +1530,9 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \frametitle{\secname: \subsecname}
 
 \vspace*{-0.1cm}
-\centering \includegraphics[scale=0.25]{figures/taxonomy.PNG}
+\begin{center}
+\includegraphics[scale=0.25]{figures/taxonomy.PNG}
+\end{center}
 
 You maximize an \textit{ad hoc} criterion:
 \vspace*{-0.1cm}
@@ -1721,9 +1816,11 @@ We wish to maximize the following likelihood:
 \begin{frame}
 \frametitle{\secname}
 
-\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{3}
-\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_NN/feature_0_iteration_\i.tex}}%
-\end{animateinline}
+\begin{figure}
+%\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{3}
+%\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_NN/feature_0_iteration_\i.tex}}%
+%\end{animateinline}
+\end{figure}
 
 \end{frame}
 
@@ -1911,10 +2008,11 @@ $\left( \begin{array}{c}
 \begin{frame}
 \frametitle{\secname}
 
-\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{5}
-\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_SEM/sem_feature_1_iter_\i.tex}}%
-\end{animateinline}
-
+\begin{figure}
+%\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{5}
+%\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_SEM/sem_feature_1_iter_\i.tex}}%
+%\end{animateinline}
+\end{figure}
 
 \end{frame}
 
@@ -2002,7 +2100,7 @@ Electronics & 52.9 (11.9) & 55.8 (10.8) & 56.3 (10.2)  & \textcolor{green}{72.6}
 \end{tabular}}
 \end{table}
 
-See \href{https://gist.github.com/adimajo/eb007492007d650091f6bd7cb2047493}{this gist} for $\chi^2$ automated grouping tests.
+%See \href{https://gist.github.com/adimajo/eb007492007d650091f6bd7cb2047493}{this gist} for $\chi^2$ automated grouping tests.
 
 \end{frame}
 
@@ -2019,7 +2117,7 @@ See \href{https://gist.github.com/adimajo/eb007492007d650091f6bd7cb2047493}{this
 \frametitle{\secname: \subsecname}
 
 Upper triangular matrix with $\delta_{k,\ell} = 1 $ if $k < \ell$ and features p and q ``interact'' in the logistic regression.
-\[ \text{logit}(p_{\bm{\theta}_{\bm{f}}}(1|\q(\bm{x}))) = \theta_0 + \sum_{j=1}^{d} \theta_j^{\q_j(x_j)} + \sum_{1\leq k < \ell \leq d} \delta_{k,\ell} \theta_{k,\ell}^{\q_k(x_k) f_{\ell}(x_{\ell})} \]
+\[ \text{logit}(p_{\bm{\theta}}(1|\q(\bm{x}))) = \theta_0 + \sum_{j=1}^{d} \theta_j^{\q_j(x_j)} + \sum_{1\leq k < \ell \leq d} \delta_{k,\ell} \theta_{k,\ell}^{\q_k(x_k) f_{\ell}(x_{\ell})} \]
 \uncover<2->{
 Imagine for now that the discretization $\q(\bm{x})$ is fixed. The criterion becomes:
 \begin{align*}
@@ -2049,18 +2147,18 @@ Strategy used here: Metropolis-Hastings sampling algorithm.
 
 \only<3>{
 \begin{align*}
-p(y|\q & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \q, \bm{\delta}) p(\bm{\delta}) \\
-p(\bm{\delta} | \q,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) p(\bm{\delta})
+p(y|\bqk ) & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \bqk, \bm{\delta}) p(\bm{\delta}) \\
+p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) p(\bm{\delta})
 \end{align*}
 }
 \uncover<4->{
 \begin{align*}
-p(y|\q) & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \q, \bm{\delta}) p(\bm{\delta}) \\
-p(\bm{\delta} | \q,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) \textcolor{red}{\cancel{p(\bm{\delta})}} \hspace{1cm} p(\delta_{p,q}) = \frac{1}{2}
+p(y| \bqk ) & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \bqk, \bm{\delta}) p(\bm{\delta}) \\
+p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) \textcolor{red}{\cancel{p(\bm{\delta})}} \hspace{1cm} p(\delta_{p,q}) = \frac{1}{2}
 \end{align*}
 }
 \uncover<5->{
-Which transition proposal $q: ({\{0,1\}}^{\frac{d(d-1)}{2}},{\{0,1\}}^{\frac{d(d-1)}{2}}) \mapsto [0 ; 1]$?
+Which transition proposal $\tr: ({\{0,1\}}^{\frac{d(d-1)}{2}},{\{0,1\}}^{\frac{d(d-1)}{2}}) \mapsto [0 ; 1]$?
 }
 
 \end{frame}
@@ -2473,37 +2571,58 @@ Gini & 69.7 & 25.8 & \textbf{69.7} & 17.7 & 48.4 & 65.8 & \textbf{69.7} \\
 
 
 
-\section{Bonus}
+%\section{Bonus}
+%
+%
+%\begin{frame}[allowframebreaks]
+%\frametitle{\secname}
+%
+%\textbf{Big ``unstructured'' data}
+%
+%Some theoretical results about an ever bigger $d$ (not the one you think about though).
+%
+%\bigskip
+%
+%\textbf{Online logistic regression}
+%
+%What if we dynamically adjusted logistic regression coefficients of a given scorecard (still learnt on a cold database) on new data as they come in?
+%
+%\pagebreak
+%
+%\textbf{Profitability}
+%
+%Good / bad label is merely a proxy of the true performance measure: profitability.
+%
+%\underline{Already done}: weighting observations by the amount of the loan gives rise to roughly the same logistic regression coefficients.
+%
+%\bigskip
+%
+%\textbf{Predicting IR3 in 2 months based on the month's applications}
+%
+%Current process: finance people, wait 3 months, if risk $\neq$ budget then adjust acceptance policy, wait 3 months again and repeat.
+%
+%Couldn't we anticipate by looking at the quality (\textit{e.g.}\ through the score) of the applications?
+%
+%\end{frame}
+
+\section{Conclusion and future work}
+
+\subsection{Conclusion}
+
+\begin{frame}
+\frametitle{\subsecname}
 
 
-\begin{frame}[allowframebreaks]
-\frametitle{\secname}
 
-\textbf{Big ``unstructured'' data}
+\end{frame}
 
-Some theoretical results about an ever bigger $d$ (not the one you think about though).
 
-\bigskip
+\subsection{Future work}
 
-\textbf{Online logistic regression}
+\begin{frame}
+\frametitle{\subsecname}
 
-What if we dynamically adjusted logistic regression coefficients of a given scorecard (still learnt on a cold database) on new data as they come in?
 
-\pagebreak
-
-\textbf{Profitability}
-
-Good / bad label is merely a proxy of the true performance measure: profitability.
-
-\underline{Already done}: weighting observations by the amount of the loan gives rise to roughly the same logistic regression coefficients.
-
-\bigskip
-
-\textbf{Predicting IR3 in 2 months based on the month's applications}
-
-Current process: finance people, wait 3 months, if risk $\neq$ budget then adjust acceptance policy, wait 3 months again and repeat.
-
-Couldn't we anticipate by looking at the quality (\textit{e.g.}\ through the score) of the applications?
 
 \end{frame}
 
