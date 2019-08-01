@@ -41,6 +41,7 @@
 \usepackage{subcaption}
 \usepackage[backend=biber,bibencoding=utf8]{biblatex}
 \usepackage{animate}
+\usepackage{listings}
 \usetikzlibrary{calc}
 \usetikzlibrary{hobby}
 \makeatletter % from https://tex.stackexchange.com/a/283273/121799
@@ -263,6 +264,36 @@ yshift=-3ex,
   dummy/.style    = {circle,draw,color=black}
 }
 
+\newcommand\rstyle{%
+  \NoAutoSpacing
+  \lstset{%
+    language=R,
+    alsoletter={_},
+otherkeywords={install_github},             % Add keywords here
+%    basicstyle=\small,
+    keywordstyle=\color{blue},
+    stringstyle=\color{green},
+%    numbers=left,
+%    numberstyle=\tiny,
+%    numbersep=5pt,
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{blue},  % the style that is used for the line-numbers
+  stepnumber=1,                   % the step between two line-numbers. If it is 1, each line
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+    frame=single%
+  }%
+}
+
+\lstnewenvironment{rlisting}
+{\rstyle}{}
+
+\newcommand\rinline[1]{{\rstyle\lstinline!#1!}}
 
 % Allows the use of \toprule, \midrule and \bottomrule in tables
 
@@ -270,7 +301,7 @@ yshift=-3ex,
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title[Soutenance]{Modèles de classification supervisée \\ et semi-supervisée \\ {\small Contrôle des pertes d’information inhérentes au scoring en risque de crédit}}
+\title[Soutenance]{Modèles de classification supervisée \\ et semi-supervisée \\ {\small Contrôle des pertes d’information inhérentes \\ au scoring en risque de crédit}}
 
 \author{Soutenance de thèse d'Adrien Ehrhardt \\ {\footnotesize
 Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
@@ -947,7 +978,7 @@ We wish we had:
 which asymptotically approximates:
 \begin{align*}
 \bm{\theta}^\star & = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}})] \\
-& = \argmax_{\bm{\theta} \in \bm{\Theta}} \mathbb{E}_{\bm{x}, y \sim p} [\ln p_{\bm{\theta}}(y | \bm{x})].
+& = \argmax_{\bm{\theta}} \mathbb{E}_{\bm{x}, y \sim p} [\ln p_{\bm{\theta}}(y | \bm{x})].
 \end{align*}
 But we lack $\mathbf{y}_{\nf}$.
 \vspace*{-0.8cm}
@@ -1028,22 +1059,33 @@ But we lack $\mathbf{y}_{\nf}$.
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-modèle de financement
-modèle "gamma"
-algorithme EM
+Contrary to semi-supervised learning~\cite{chapelle2009semi}, labels $y$ are not MCAR.
+
+\medskip
+
+\uncover<2->{
+Suppose there is some hidden financing mechanism belonging to a parametrized family ${p_{\bm{\phi}}(z | \bm{x}, y)}_{\bm{\phi} \in \bm{\Phi}}$.
+}
+
+\medskip
+
+\uncover<3->{
+Combining ``acceptance'' and credit-worthiness probability distributions, we get:
+\[ p(y,z | \bm{x}) = p_{\bm{\theta}(\bm{\gamma})}(y | \bm{x}) p_{\bm{\phi}(\bm{\gamma})}(z | \bm{x}, y). \]
+}
+
+\medskip
+
+\uncover<4->{
+To estimate $\bm{\gamma}$, we could rely on Maximum Likelihood theory and maximize:
+\[ \ell(\bm{\gamma}; \mathcal{T}) = \sum_{i = 1}^n \ln p_{\bm{gamma}}(y_i,\f | \bm{x}_i) + \sum_{i=n'}^{n+n'} \ln \sum_{y \in \{0,1\}} p_{\bm{gamma}}(y,\nf | \bm{x}_i). \]
+}
 
 \end{frame}
 
 
 
 
-\subsection{hypothèses}
-
-\begin{frame}
-\frametitle{\secname : \subsecname}
-
-
-\end{frame}
 
 
 \subsection*{Missingness mechanism}
@@ -1052,17 +1094,20 @@ algorithme EM
 \frametitle{\secname : \subsecname}
 
 \begin{itemize}
-\item \textbf{MAR} : $\forall \: x,y,z, \; p(z| \bm{x},y) = p(z| \bm{x})$
+\item \textbf{Ignorability}: no functional dependence between $\bm{\theta}$ and $\bm{\phi}$, \textit{e.g.}\ $\bm{\gamma} = (\bm{\theta},\bm{\phi})$.
+
+\item<2-> \textbf{MAR}: $\forall \: x,y,z, \; p(z| \bm{x},y) = p(z| \bm{x})$
 
 $\rightarrow$ Acceptance is determined by an old score: $Z = \mathds{1}_{\{\bm{\theta}'X > \text{cut}\}}$.
 
-\item \textbf{MNAR} : $\exists \: x,y,z, \; p(z| \bm{x},y) \neq p(z| \bm{x})$
+\item<3-> \textbf{MNAR}: $\exists \: x,y,z, \; p(z| \bm{x},y) \neq p(z| \bm{x})$
 
 $\rightarrow$ Operators' ‘‘feeling'' $\tilde{\bm{X}}$ influence the acceptance.
 
 $\rightarrow$ Expert rules based on features $\tilde{\bm{X}}$ not in $\bm{X}$.
 \end{itemize}
 
+\uncover<4->{
 \begin{figure}
 \begin{tikzpicture}
 
@@ -1085,41 +1130,58 @@ edges
 \label{fig:mar}
 \caption{Dependencies between random variables $Y$, $\bm{\tilde{X}}$, $\bm{X}$ and $Z$}
 \end{figure}
+}
+\end{frame}
+
+
+
+\subsection{Flawed model selection}
+
+\begin{frame}
+\frametitle{\secname : \subsecname}
+
+Because no test-sample $\mathcal{T}^{\text{test}}$ is available from $p(\bm{x}, y, z)$, we cannot resort to error-rate criteria.
+
+\medskip
+
+\uncover<2->{
+We should use information criteria on the observed data $\mathcal{T}$ such as:
+\[ \text{BIC}(\hat{\bm{\gamma}};\mathcal{T}) = -2 \ell(\hat{\bm{\gamma}}; \mathcal{T}) + \text{dim}(\bm{\Gamma})\ln n, \]
+where $\hat{\bm{\gamma}} = \argmax_{\bm{\gamma}} \ell(\bm{\gamma}; \mathcal{T})$, to compare models.
+}
+
+\medskip
+
+\uncover<3->{
+It requires to precisely state the models $\{ p_{\bm{\gamma}}(y,z | \bm{x})\}_{\bm{\Gamma}}$ that compete and underlying assumptions.
+}
 
 \end{frame}
 
 
 
-\subsection{remarques sur la sélection de modèles}
+\subsection{Reject Inference strategies}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-
-\end{frame}
-
-
-
-\subsection{stratégies de réintégration de refusés}
-
-\begin{frame}
-\frametitle{\secname : \subsecname}
+We gathered 6 so-called Reject Inference methods from the literature~\cite{} that aim at re-injecting $\bm{\mathbf{x}}_{\nf}$ into the estimation procedure of $\hat{\bm{\theta}}$.
 
 6 stratégies, donner l'essence
 
 \end{frame}
 
 
-\subsection{What is at stake?}
-
-\begin{frame}
-\frametitle{\secname : \subsecname}
-\textbf{Estimators :}
-
-\hspace*{-0.2cm}\begin{alignat*}{6}
-& \text{``Oracle'':} & \sqrt[]{n+n'} && ( \hat{\bm{\theta}} - \bm{\theta}^\star ) &&& \xrightarrow[n,n' \to \infty]{\mathcal{L}} &&& \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star}) \\
-& \text{Current methodology:} & \sqrt[]{n} && ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) &&& \xrightarrow[n \to \infty]{\mathcal{L}} &&& \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})
-\end{alignat*}
+%\subsection{What is at stake?}
+%
+%\begin{frame}
+%\frametitle{\secname : \subsecname}
+%\textbf{Estimators :}
+%
+%\hspace*{-0.2cm}\begin{alignat*}{6}
+%& \text{``Oracle'':} & \sqrt[]{n+n'} && ( \hat{\bm{\theta}} - \bm{\theta}^\star ) &&& \xrightarrow[n,n' \to \infty]{\mathcal{L}} &&& \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star}) \\
+%& \text{Current methodology:} & \sqrt[]{n} && ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) &&& \xrightarrow[n \to \infty]{\mathcal{L}} &&& \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})
+%\end{alignat*}
 
 %\begin{enumerate}
 %\only<1>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
@@ -1136,24 +1198,24 @@ edges
 %
 %\end{enumerate}
 
-\bigskip
-
-\bigskip
-
-\uncover<5->{
-\textbf{\textcolor{red}{Question 1} :} asymptotics of the estimators
-
-{\centering{\fbox{(Q1) $ {\bm{\theta}}^\star \stackrel{?}{=} {{\bm{\theta}}}^\star_{\f} $}}}
-
-%\fbox{(Q2) \centering{${\Sigma}_{\bm{\theta}^\star} \stackrel{?}{=} {\Sigma}_{\f,\bm{\theta}^\star_{\f}} $}}
-
-}
-
-\uncover<6->{
-\textbf{\textcolor{red}{Question 2} :} bla
-}
-
-\end{frame}
+%\bigskip
+%
+%\bigskip
+%
+%\uncover<5->{
+%\textbf{\textcolor{red}{Question 1} :} asymptotics of the estimators
+%
+%{\centering{\fbox{(Q1) $ {\bm{\theta}}^\star \stackrel{?}{=} {{\bm{\theta}}}^\star_{\f} $}}}
+%
+%%\fbox{(Q2) \centering{${\Sigma}_{\bm{\theta}^\star} \stackrel{?}{=} {\Sigma}_{\f,\bm{\theta}^\star_{\f}} $}}
+%
+%}
+%
+%\uncover<6->{
+%\textbf{\textcolor{red}{Question 2} :} bla
+%}
+%
+%\end{frame}
 
 %----------------------------------------------------------------------------------------
 
@@ -1323,39 +1385,39 @@ For logistic regression, \textit{Reject Inference} methods amount to:
  
  
  
- \begin{frame}
-\frametitle{\secname : \subsecname}
-
-\textbf{Reclassification}\footnote{\cite{RI6,banasik,saporta}} :
-\[(\hat{\bm{\theta}}^{\text{CEM}}, \textcolor{red}{\hat{\mathbf{y}}^{\nf}}) = \argmax_{\bm{\theta},\textcolor{red}{\mathbf{{y}}^{\nf}}} \ell(\bm{\theta}; \mathcal{T}_c^{(1)}) \text{ where } \textcolor{red}{\hat{y_i}} = \argmax_{y_i} p_{\hat{\bm{\theta}}_{\f}}(y_i|\bm{x}_i).\]
-\textbf{Problem:} inconsistent estimator.
-
-\vspace*{0.2cm}
-\hspace*{-0.8cm} \centering \includegraphics[width=12cm]{figures/CEM_bias.png}
-
-\end{frame}
-
-%----------------------------------------------------------------------------------------
-
-\begin{frame}
-\frametitle{\secname : \subsecname}
-
-\textbf{Augmentation}\footnote{\cite{RI6,banasik,saporta,economix}}: MAR / misspecified model.
-\[ \ell_{\text{Aug}}(\bm{\theta}; \mathcal{T}_\f) = \sum_{i=1}^n \textcolor{red}{\frac{1}{p(\text{f}|\bm{x}_i)}} \ln(p_{\bm{\theta}}(y_i|\bm{x}_i)).\]
-\textbf{Problem:} estimation of $p(\text{f}|x_i)$ + assumes $p(\text{f}|x_i) > 0$ (clearly not true).
-
-\medskip
-
-\noindent\makebox[\linewidth]{\rule{\paperwidth}{1pt}}
-
-\medskip
-
-\textbf{Parcelling} \footnote{\cite{RI6,banasik,saporta}}:
-\[ \ell(\theta; \bm{x},\mathbf{y}_{\f},\textcolor{red}{\mathbf{\hat{y}}_{\nf}}) \text{ where } \textcolor{red}{\hat{y_i}} = \begin{cases} 1 \text{ w.p. } \textcolor{red}{\alpha_i} p_{\hat{\bm{\theta}}_{\f}}(1|\bm{x}_i,\text{f}) \\ 0 \text{ w.p. } 1-\textcolor{red}{\alpha_i} p_{\hat{\bm{\theta}}_{\f}}(1|\bm{x}_i,\text{f}) \end{cases}. \]
-
-\textbf{Problem:} MNAR assumptions hidden in $\textcolor{red}{\mathbf{\hat{y}}_{\nf}}$ ($\textcolor{red}{\alpha_i}$) impossible to test.
-
-\end{frame}
+%\begin{frame}
+%\frametitle{\secname : \subsecname}
+%
+%\textbf{Reclassification}\footnote{\cite{RI6,banasik,saporta}} :
+%\[(\hat{\bm{\theta}}^{\text{CEM}}, \textcolor{red}{\hat{\mathbf{y}}^{\nf}}) = \argmax_{\bm{\theta},\textcolor{red}{\mathbf{{y}}^{\nf}}} \ell(\bm{\theta}; \mathcal{T}_c^{(1)}) \text{ where } \textcolor{red}{\hat{y_i}} = \argmax_{y_i} p_{\hat{\bm{\theta}}_{\f}}(y_i|\bm{x}_i).\]
+%\textbf{Problem:} inconsistent estimator.
+%
+%\vspace*{0.2cm}
+%\hspace*{-0.8cm} \centering \includegraphics[width=12cm]{figures/CEM_bias.png}
+%
+%\end{frame}
+%
+%%----------------------------------------------------------------------------------------
+%
+%\begin{frame}
+%\frametitle{\secname : \subsecname}
+%
+%\textbf{Augmentation}\footnote{\cite{RI6,banasik,saporta,economix}}: MAR / misspecified model.
+%\[ \ell_{\text{Aug}}(\bm{\theta}; \mathcal{T}_\f) = \sum_{i=1}^n \textcolor{red}{\frac{1}{p(\text{f}|\bm{x}_i)}} \ln(p_{\bm{\theta}}(y_i|\bm{x}_i)).\]
+%\textbf{Problem:} estimation of $p(\text{f}|x_i)$ + assumes $p(\text{f}|x_i) > 0$ (clearly not true).
+%
+%\medskip
+%
+%\noindent\makebox[\linewidth]{\rule{\paperwidth}{1pt}}
+%
+%\medskip
+%
+%\textbf{Parcelling} \footnote{\cite{RI6,banasik,saporta}}:
+%\[ \ell(\theta; \bm{x},\mathbf{y}_{\f},\textcolor{red}{\mathbf{\hat{y}}_{\nf}}) \text{ where } \textcolor{red}{\hat{y_i}} = \begin{cases} 1 \text{ w.p. } \textcolor{red}{\alpha_i} p_{\hat{\bm{\theta}}_{\f}}(1|\bm{x}_i,\text{f}) \\ 0 \text{ w.p. } 1-\textcolor{red}{\alpha_i} p_{\hat{\bm{\theta}}_{\f}}(1|\bm{x}_i,\text{f}) \end{cases}. \]
+%
+%\textbf{Problem:} MNAR assumptions hidden in $\textcolor{red}{\mathbf{\hat{y}}_{\nf}}$ ($\textcolor{red}{\alpha_i}$) impossible to test.
+%
+%\end{frame}
 
 
 
@@ -1409,9 +1471,9 @@ For logistic regression, \textit{Reject Inference} methods amount to:
 \frametitle{\secname: \subsecname}
 
 \begin{figure}[!ht]
-%\begin{animateinline}[poster=first, controls=all, palindrome, autopause, autoresume, width=\textwidth, height=6cm]{3}
-%\multiframe{99}{i=2+1}{\input{CODE_FIGURES/EXAMPLE_DISC/disc_plot\i.tex}}%
-%\end{animateinline}
+\begin{animateinline}[poster=first, controls=all, palindrome, autopause, autoresume, width=\textwidth, height=6cm]{3}
+\multiframe{99}{i=2+1}{\input{CODE_FIGURES/EXAMPLE_DISC/disc_plot\i.tex}}%
+\end{animateinline}
 \end{figure}
 
 \end{frame}
@@ -1421,7 +1483,7 @@ For logistic regression, \textit{Reject Inference} methods amount to:
 \subsection{Some more notations}
 
 \begin{frame}[allowframebreaks]
-\frametitle{\subsecname}
+\frametitle{\secname: \subsecname}
 
 %\begin{block}{Raw data}
 %\vspace*{-0.9cm}
@@ -1534,7 +1596,7 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \includegraphics[scale=0.25]{figures/taxonomy.PNG}
 \end{center}
 
-You maximize an \textit{ad hoc} criterion:
+These approaches maximize an \textit{ad hoc} criterion:
 \vspace*{-0.1cm}
 \[ \hat{\q} = \argmax_{\q} \text{CRIT}(\mathcal{T}_\f), \]
 \vspace*{-0.1cm}
@@ -1575,7 +1637,7 @@ and {\bf hope} that it's aligned with your original goal:
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-\[ {\s}^{\text{MAP}}_{j,h}(x_j) = 1 \text{ if } h = \argmax_{1 \leq h' \leq m_j} \s_{\hat{\ag}_{j,h'}}, 0 \text{ otherwise.} \]
+\[ \hat{\s}_{j,h}(x_j) = 1 \text{ if } h = \argmax_{1 \leq h' \leq m_j} \s_{\hat{\ag}_{j,h'}}, 0 \text{ otherwise.} \]
 
 \begin{tikzpicture}[scale=0.9]
 \begin{axis}[
@@ -1671,7 +1733,7 @@ and {\bf hope} that it's aligned with your original goal:
 \frametitle{\secname: \subsecname}
 
 We wish to maximize the following likelihood:
-\[ (\hat{\bm{\theta}}, \hat{\bm{\alpha}}) = \argmax_{\bm{\theta}, \bm{\alpha}} \ell(\bm{\theta}, \bm{\alpha} ; \bm{x}, \bm{y}) = \sum_{i=1}^n p_{\bm{\theta}}(y_i | \q_{\alpha}(\bm{x}_i)). \]
+\[ (\hat{\bm{\theta}}, \hat{\bm{\alpha}}) = \argmax_{\bm{\theta}, \bm{\alpha}} \ell(\bm{\theta}, \bm{\alpha} ; \bm{x}, \bm{y}) = \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i | \q_{\alpha}(\bm{x}_i)). \]
 
 \medskip
 
@@ -1680,7 +1742,7 @@ We wish to maximize the following likelihood:
 \medskip
 
 \uncover<2->{
-{\bf If not}, ${\q}^{\text{MAP}}$ is ``guaranteed'' to be a good candidate quantization.
+{\bf If not}, $\hat{\q}$ is ``guaranteed'' to be a good candidate quantization.
 }
 
 \medskip
@@ -1777,7 +1839,7 @@ We wish to maximize the following likelihood:
 
 
 \begin{frame}
-\frametitle{Estimation \textit{via} neural networks}
+\frametitle{\secname: \subsecname}
 
 % \newlength\figureheight
 % \newlength\figurewidth
@@ -1817,9 +1879,9 @@ We wish to maximize the following likelihood:
 \frametitle{\secname}
 
 \begin{figure}
-%\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{3}
-%\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_NN/feature_0_iteration_\i.tex}}%
-%\end{animateinline}
+\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{3}
+\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_NN/feature_0_iteration_\i.tex}}%
+\end{animateinline}
 \end{figure}
 
 \end{frame}
@@ -1832,8 +1894,8 @@ We wish to maximize the following likelihood:
 \frametitle{\secname : \subsecname}
 
 \begin{block}{New model selection criterion}
-We have drastically restricted the search space to clever candidates ${\q}^{\text{MAP}(1)}, \ldots, {\q}^{\text{MAP}(\text{iter})}$ resulting from the the gradient descent steps.
-\[ (\q^\star,\bth^\star) = \argmin_{\textcolor{red}{\hat{\q} \in \{{\q}^{\text{MAP}(1)}, \ldots, {\q}^{\text{MAP}(\text{iter})}\}},\bth \in \Theta_{\textcolor{red}{\bm{m}}}} \text{BIC}(\hat{\bth}_{\hat{\q}}) \]
+We have drastically restricted the search space to clever candidates $\hat{\q}^(1), \ldots, \hat{\q}^{(\text{iter})}$ resulting from the the gradient descent steps.
+\[ (\q^\star,\bth^\star) = \argmin_{\textcolor{red}{\hat{\q} \in \{\hat{\q}^{(1)}, \ldots, \hat{\q}^{(\text{iter})}\}},\bth \in \bm{\Theta}_{\textcolor{red}{\bm{m}}}} \text{BIC}(\hat{\bth}_{\hat{\q}}) \]
 \end{block}
 
 \medskip
@@ -1859,162 +1921,162 @@ Start with $\bm{m} = (m_{\text{max}})_1^d$ and ``wait'' \dots
 
 
 
-\subsection{SEM-Gibbs}
-
-\begin{frame}
-\frametitle{\secname : \subsecname}
-
-Originally (and as implemented in the \textsc{R} package glmdisc), the optimization was a bit different:
-\begin{itemize}
-\item<2-> $\q$ is considered a latent (unobserved) feature;
-\item<3-> A classical EM algorithm is intractable since it requires an Expectation step over all possible quantizations;
-\item<4-> Solution: random draw $\approx$ Bayesian statistics;
-\end{itemize}
-
-\end{frame}
-
-
-\begin{frame}
-\frametitle{\subsecname: estimation}
-
-``Classical'' estimation strategy with latent variables: EM algorithm.
-
-\bigskip
-
-\uncover<2->{
-There would still be a sum over $\bm{\mathcal{Q}}_{\bm{m}}$: $p(y|\bm{x},\bm{\theta},\bm{\alpha}) = \sum_{\q \in \bm{\mathcal{Q}}_{\bm{m}}} p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha}_j}(\q_j|x_j)$
-}
-
-\bigskip
-
-\uncover<3->{
-Use a Stochastic-EM! Draw $\q$ knowing that:
-}
-\medskip
-\uncover<4->{
-\[p(\q|\bm{x},y) = \underbrace{\dfrac{p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha_j}}(\q_j|x_j)}{\sum_{\bm{q} \in \bm{\mathcal{Q}}_{\bm{m}}} p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha}_j}(\q_j|x_j)}}_{\text{still difficult to calculate}}\]
-}
-\medskip
-\uncover<5->{
-Gibbs-sampling step:
-\[p(\q_j|\bm{x},y,\q_{\{-j\}}) \propto p_{\bm{\theta}}(y|\q) p_{\bm{\alpha_j}}(\q_j|x_j)\]
-}
-
-
-\end{frame}
-
-
-
-
-\begin{frame}
-\frametitle{\subsecname: algorithm}
-
-\tiny
-
-
-\textbf{Initialization}
-
-
-\medskip
-
-$\left( \begin{array}{ccc}
-x_{1,1} & \cdots & x_{1,d}  \\
- \vdots & \vdots & \vdots \\
- x_{n,1} & \cdots & x_{n,d} \end{array} \right)
-\begin{array}{c}
-\text{at random} \\
-\Rightarrow \end{array}
-\left( \begin{array}{ccc}
-\q_{1,1} & \cdots & \q_{1,d}  \\
- \vdots & \vdots & \vdots \\
- \q_{n,1} & \cdots & \q_{n,d} \end{array} \right)$
-
-\medskip
-
-\textbf{Loop}
-
-\medskip
-
-$\left( \begin{array}{c}
-y_1 \\
-\vdots \\
-y_n \end{array} \right)
-\begin{array}{c}
-\text{logistic} \\
-\text{regression} \\
-\Rightarrow \end{array}
-\left( \begin{array}{ccc}
-\q_{1,1} & \cdots & \q_{1,d}  \\
- \vdots & \vdots & \vdots \\
- \q_{n,1} & \cdots & \q_{n,d} \end{array} \right)
-\begin{array}{c}
-\text{polytomous} \\
-\text{regression} \\
-\Rightarrow \end{array}
-\left( \begin{array}{ccc}
-x_{1,1} & \cdots & x_{1,d}  \\
- \vdots & \vdots & \vdots \\
- x_{n,1} & \cdots & x_{n,d} \end{array} \right)
-$
-
-\medskip
-
-\textbf{Updating $\q$}
-
-\medskip
-
-$\left( \begin{array}{c}
-p(y_1,\q_{1,j}=k|\bm{x}_i)  \\
-\vdots \\
-p(y_n,\q_{n,j}=k|\bm{x}_i) \end{array} \right)
-\begin{array}{c}
-\text{random} \\
-\text{sampling} \\
-\Rightarrow \end{array}
-\left( \begin{array}{ccc}
-\q_{1,j}  \\
- \vdots \\
- \q_{n,j} \end{array} \right)$
-
-\medskip
-
-\textbf{Calculating $\q^{\text{MAP}}$}
-
-\medskip
-
-$\left( \begin{array}{c}
-\q^{\text{MAP},1,j}  \\
-\vdots \\
-\q^{\text{MAP},n,j} \end{array} \right)
-\begin{array}{c}
-\text{MAP} \\
-\text{estimate} \\
-= \end{array}
-\left( \begin{array}{ccc}
-\argmax_{\q_j} p_{\bm{\alpha_j}}(\q_j | x_{1,j})  \\
- \vdots \\
-\argmax_{\q_j} p_{\bm{\alpha_j}}(\q_j | x_{n,j}) \end{array} \right)$
- 
- 
-\normalsize
-
-\end{frame}
-
-
-
-
-
-
-\begin{frame}
-\frametitle{\secname}
-
-\begin{figure}
-%\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{5}
-%\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_SEM/sem_feature_1_iter_\i.tex}}%
-%\end{animateinline}
-\end{figure}
-
-\end{frame}
+%\subsection{SEM-Gibbs}
+%
+%\begin{frame}
+%\frametitle{\secname : \subsecname}
+%
+%Originally (and as implemented in the \textsc{R} package glmdisc), the optimization was a bit different:
+%\begin{itemize}
+%\item<2-> $\q$ is considered a latent (unobserved) feature;
+%\item<3-> A classical EM algorithm is intractable since it requires an Expectation step over all possible quantizations;
+%\item<4-> Solution: random draw $\approx$ Bayesian statistics;
+%\end{itemize}
+%
+%\end{frame}
+%
+%
+%\begin{frame}
+%\frametitle{\subsecname: estimation}
+%
+%``Classical'' estimation strategy with latent variables: EM algorithm.
+%
+%\bigskip
+%
+%\uncover<2->{
+%There would still be a sum over $\bm{\mathcal{Q}}_{\bm{m}}$: $p(y|\bm{x},\bm{\theta},\bm{\alpha}) = \sum_{\q \in \bm{\mathcal{Q}}_{\bm{m}}} p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha}_j}(\q_j|x_j)$
+%}
+%
+%\bigskip
+%
+%\uncover<3->{
+%Use a Stochastic-EM! Draw $\q$ knowing that:
+%}
+%\medskip
+%\uncover<4->{
+%\[p(\q|\bm{x},y) = \underbrace{\dfrac{p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha_j}}(\q_j|x_j)}{\sum_{\bm{q} \in \bm{\mathcal{Q}}_{\bm{m}}} p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha}_j}(\q_j|x_j)}}_{\text{still difficult to calculate}}\]
+%}
+%\medskip
+%\uncover<5->{
+%Gibbs-sampling step:
+%\[p(\q_j|\bm{x},y,\q_{\{-j\}}) \propto p_{\bm{\theta}}(y|\q) p_{\bm{\alpha_j}}(\q_j|x_j)\]
+%}
+%
+%
+%\end{frame}
+%
+%
+%
+%
+%\begin{frame}
+%\frametitle{\subsecname: algorithm}
+%
+%\tiny
+%
+%
+%\textbf{Initialization}
+%
+%
+%\medskip
+%
+%$\left( \begin{array}{ccc}
+%x_{1,1} & \cdots & x_{1,d}  \\
+% \vdots & \vdots & \vdots \\
+% x_{n,1} & \cdots & x_{n,d} \end{array} \right)
+%\begin{array}{c}
+%\text{at random} \\
+%\Rightarrow \end{array}
+%\left( \begin{array}{ccc}
+%\q_{1,1} & \cdots & \q_{1,d}  \\
+% \vdots & \vdots & \vdots \\
+% \q_{n,1} & \cdots & \q_{n,d} \end{array} \right)$
+%
+%\medskip
+%
+%\textbf{Loop}
+%
+%\medskip
+%
+%$\left( \begin{array}{c}
+%y_1 \\
+%\vdots \\
+%y_n \end{array} \right)
+%\begin{array}{c}
+%\text{logistic} \\
+%\text{regression} \\
+%\Rightarrow \end{array}
+%\left( \begin{array}{ccc}
+%\q_{1,1} & \cdots & \q_{1,d}  \\
+% \vdots & \vdots & \vdots \\
+% \q_{n,1} & \cdots & \q_{n,d} \end{array} \right)
+%\begin{array}{c}
+%\text{polytomous} \\
+%\text{regression} \\
+%\Rightarrow \end{array}
+%\left( \begin{array}{ccc}
+%x_{1,1} & \cdots & x_{1,d}  \\
+% \vdots & \vdots & \vdots \\
+% x_{n,1} & \cdots & x_{n,d} \end{array} \right)
+%$
+%
+%\medskip
+%
+%\textbf{Updating $\q$}
+%
+%\medskip
+%
+%$\left( \begin{array}{c}
+%p(y_1,\q_{1,j}=k|\bm{x}_i)  \\
+%\vdots \\
+%p(y_n,\q_{n,j}=k|\bm{x}_i) \end{array} \right)
+%\begin{array}{c}
+%\text{random} \\
+%\text{sampling} \\
+%\Rightarrow \end{array}
+%\left( \begin{array}{ccc}
+%\q_{1,j}  \\
+% \vdots \\
+% \q_{n,j} \end{array} \right)$
+%
+%\medskip
+%
+%\textbf{Calculating $\q^{\text{MAP}}$}
+%
+%\medskip
+%
+%$\left( \begin{array}{c}
+%\q^{\text{MAP},1,j}  \\
+%\vdots \\
+%\q^{\text{MAP},n,j} \end{array} \right)
+%\begin{array}{c}
+%\text{MAP} \\
+%\text{estimate} \\
+%= \end{array}
+%\left( \begin{array}{ccc}
+%\argmax_{\q_j} p_{\bm{\alpha_j}}(\q_j | x_{1,j})  \\
+% \vdots \\
+%\argmax_{\q_j} p_{\bm{\alpha_j}}(\q_j | x_{n,j}) \end{array} \right)$
+% 
+% 
+%\normalsize
+%
+%\end{frame}
+%
+%
+%
+%
+%
+%
+%\begin{frame}
+%\frametitle{\secname}
+%
+%\begin{figure}
+%%\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{5}
+%%\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_SEM/sem_feature_1_iter_\i.tex}}%
+%%\end{animateinline}
+%\end{figure}
+%
+%\end{frame}
 
 
 
@@ -2500,9 +2562,9 @@ We suppose there is a true segmentation $c^\star, K^\star$ and logistic regressi
 \medskip
 
 \uncover<4->{
-If we could evaluate all segmentations, the true one would be selected by
-\[ \argmax_{c,K} \sum_{c=1}^K \text{BIC}(\hat{\bm{\theta}}^c),\]
-where $\hat{\bm{\theta}}^c$ is the MLE of the logistic regression on .
+If we could evaluate all segmentations, the best one could be selected by
+\[ (\hat{c}, \hat{K}) = \argmax_{c,K} \sum_{c=1}^K \text{BIC}(\hat{\bm{\theta}}^c),\]
+where $\hat{\bm{\theta}}^c$ is the MLE of the logistic regression of segment $c$.
 }
 
 \end{frame}
@@ -2525,13 +2587,13 @@ Similarly to the quantization proposal: ability to be in several segments at a t
 \medskip
 
 \uncover<3->{
-\[ c_i^{(s+1)} \sim p_{\bm{\theta}^{\cdot(s)}}(y_i | \bm{x}_i) p_{\beta^{(s)}}(\cdot | \bm{x}_i). \]
+\[ c_i^{(s+1)} \sim p_{\bm{\theta}^{\cdot(s)}}(y_i | \bm{x}_i; \cdot) p_{\beta^{(s)}}(\cdot | \bm{x}_i). \]
 }
 
 \medskip
 
 \uncover<4->{
-\[ \bm{\theta}^{c(s+1)} = \argmax_{\bm{\theta}^c} \sum_{i=1}^n \mathds{1}_{c}(c_i^{s+1)}) \ln p_{\bm{\theta}^c}(y_i | \bm{x}_i, c). \]
+\[ \bm{\theta}^{c(s+1)} = \argmax_{\bm{\theta}^c} \sum_{i=1}^n \mathds{1}_{c}(c_i^{s+1)}) \ln p_{\bm{\theta}^c}(y_i | \bm{x}_i ; c). \]
 }
 
 \medskip
@@ -2612,7 +2674,24 @@ Gini & 69.7 & 25.8 & \textbf{69.7} & 17.7 & 48.4 & 65.8 & \textbf{69.7} \\
 \begin{frame}
 \frametitle{\subsecname}
 
+This PhD tackled three main issues of ``traditional'' Credit Scoring:
+\begin{enumerate}
+\item Reject inference: impact of tossing away not-financed clients,
 
+\medskip
+
+\only<2>{Conclusion: sound problem reformulation, no method recommended, \lstinline{scoringTools} \textsc{R} package.}
+\item<3-> ``Constrained'' representation learning: discretization, grouping, interaction screening,
+
+\medskip
+
+\only<4>{Conclusion: better performance, less time-consuming, some guarantees, \lstinline{glmdisc} \textsc{R} package.}
+\item<5-> Predictive segmentation: logistic regression trees,
+
+\medskip
+
+\only<6>{Conclusion: first experiments on simulated and real data are encouraging, \lstinline{glmtree} \textsc{R} package.}
+\end{enumerate}
 
 \end{frame}
 
@@ -2622,7 +2701,24 @@ Gini & 69.7 & 25.8 & \textbf{69.7} & 17.7 & 48.4 & 65.8 & \textbf{69.7} \\
 \begin{frame}
 \frametitle{\subsecname}
 
+There remains a lot of open questions:
+\begin{enumerate}
+\item Predictive segmentation: logistic regression trees,
 
+\medskip
+
+\only<2>{Perspective: allow for quantization / interaction screening and feature selection at each iteration.}
+\item<3-> Credit Scoring for profit: swap ``$p($2 unpaid instalments$)$'' for $p($profit$>0)$ or $\mathbb{E}[\text{profit}]$,
+
+\medskip
+
+\only<4>{Perspective: experiment observation-wise misclassification costs.}
+\item<5-> Representation learning for fine-grained unstructured data,
+
+\medskip
+
+\only<6>{Perspective: provide statistically sound methods to aggregate ``behavioural'' data, \textit{e.g.}\ web visitation patterns.}
+\end{enumerate}
 
 \end{frame}
 
