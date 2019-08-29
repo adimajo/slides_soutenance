@@ -50,6 +50,8 @@
 \long\def\xintdothis #1#2\xintorthat #3{\fi #1}%
 \let\xintorthat \@firstofone
 
+\captionsetup[figure]{labelfont={color=orange}}
+
 \long\def\@thirdoffour  #1#2#3#4{#3}%
 \long\def\@fourthoffour #1#2#3#4{#4}%
 
@@ -301,7 +303,7 @@ otherkeywords={install_github},             % Add keywords here
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title[Soutenance]{Modèles de classification supervisée \\ et semi-supervisée \\ {\small Contrôle des pertes d’information inhérentes \\ au scoring en risque de crédit}}
+\title[Soutenance]{Formalisation et étude de problématiques \\ de scoring en risque de crédit \\ {\small Inférence de rejet, discrétisation de variables et interactions, \\ arbres de régression logistique}}
 
 \author{Soutenance de thèse d'Adrien Ehrhardt \\ {\footnotesize
 Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
@@ -461,7 +463,7 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 
 \section{Context and notations}
 
-\subsection{Industrial setting}
+\subsection{industrial setting}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
@@ -470,14 +472,14 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \centering
 \begin{tiny}
 \hspace*{-0.7cm}\begin{tabular}{p{1.7cm}|p{1.1cm}|p{1cm}|p{1.4cm}|p{1.5cm}||p{0.6cm}|p{1cm}}
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{Job}} & \only<1-3>{Home} & \only<1-3>{Time in job} & \textcolor <4,6> {OliveGreen} {\textbf<4,6>{Family status}} & \textcolor <4,5> {OliveGreen} {\textbf<4,5>{Wages}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{Score}}} & Repayment \\
+\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<1-3>{Home} & \only<1-3>{Time in job} & \textcolor <4,6> {green} {\textbf<4,6>{Family status}} & \textcolor <4,5> {green} {\textbf<4,5>{Wages}} & \uncover<8->{\textcolor{green}{\textbf{Score}}} & Repayment \\
 \hline
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<1-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<1-3>{Owner} & \only<1-3>{20} & \textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<1-5>{Widower}  \only<6>{?+Alone}}} & \textcolor <4-5> {OliveGreen} {\textbf<4-5>{\only<1-4>{2000} \only<5->{]1500;2000]}}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{225}}} & 0  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<1-5>{?} \only<6->{?+Low-qualified}}} & \only<1-3>{Renter} & \only<1-3>{10} & \textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<1-5>{Common-law}  \only<6>{Union}}} & \textcolor <4-5> {OliveGreen} {\textbf<4>{\only<1-4>{1700} \only<5->{]1500;2000]}}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{190}}} & 1  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<1-5>{Licensed professional} \only<6->{High-qualified}}} & \only<1-3>{Starter} & \only<1-3>{5} & \textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<1-5>{Divorced} \only<6>{?+Alone}}} & \textcolor <4-5> {OliveGreen} {\textbf<4>{\only<1-4>{4000} \only<5->{]2000;$\infty$[}}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{218}}} & 0  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<1-5>{Executive} \only<6->{High-qualified}}} & \only<1-3>{By work} & \only<1-3>{8} & \textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<1-5>{Single} \only<6>{?+Alone}}} & \textcolor <4-5> {OliveGreen} {\textbf<4>{\only<1-4>{2700} \only<5->{]2000;$\infty$[}}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{202}}} & 1  \\
-\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{NA}}} & NA  \\
-\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<1-3>{Owner} & \only<1-3>{20} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Widower}  \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4-5>{\only<1-4>{2000} \only<5->{]1500;2000]}}} & \uncover<8->{\textcolor{green}{\textbf{225}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{?} \only<6->{?+Low-qualified}}} & \only<1-3>{Renter} & \only<1-3>{10} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Common-law}  \only<6>{Union}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{1700} \only<5->{]1500;2000]}}} & \uncover<8->{\textcolor{green}{\textbf{190}}} & 1  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Licensed professional} \only<6->{High-qualified}}} & \only<1-3>{Starter} & \only<1-3>{5} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Divorced} \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{4000} \only<5->{]2000;$\infty$[}}} & \uncover<8->{\textcolor{green}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Executive} \only<6->{High-qualified}}} & \only<1-3>{By work} & \only<1-3>{8} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Single} \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{2700} \only<5->{]2000;$\infty$[}}} & \uncover<8->{\textcolor{green}{\textbf{202}}} & 1  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<8->{\textcolor{green}{\textbf{NA}}} & NA  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
 \end{tabular}
 \end{tiny}
 \caption{\label{tab:exemple} Dataset with outliers and missing values.} 
@@ -489,14 +491,14 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \centering
 \begin{tiny}
 \hspace*{-0.7cm}\begin{tabular}{p{2cm}|p{1.1cm}|p{1cm}|p{2.4cm}||p{0.6cm}|p{1cm}}
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {OliveGreen} {\textbf<7>{Family status x Wages}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{Score}}} & Repayment \\
+\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {green} {\textbf<7>{Family status x Wages}} & \uncover<8->{\textcolor{green}{\textbf{Score}}} & Repayment \\
 \hline
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {OliveGreen} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{225}}} & 0  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {OliveGreen} {\textbf<7>{Union x ]1500;2000]}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{190}}} & 1  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {OliveGreen} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{218}}} & 0  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {OliveGreen} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<8->{\textcolor{OliveGreen}{\textbf{202}}} & 1  \\
-\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
-\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {green} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<8->{\textcolor{green}{\textbf{225}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {green} {\textbf<7>{Union x ]1500;2000]}} & \uncover<8->{\textcolor{green}{\textbf{190}}} & 1  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<8->{\textcolor{green}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<8->{\textcolor{green}{\textbf{202}}} & 1  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
 \end{tabular}
 \end{tiny}
 \caption{\label{tab:exemple} Dataset with outliers and missing values.}
@@ -508,15 +510,15 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \centering
 \begin{tiny}
 \hspace*{-0.7cm}\begin{tabular}{p{2cm}|p{1.1cm}|p{1cm}|p{2.4cm}||p{0.6cm}|p{1cm}}
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {OliveGreen} {\textbf<7>{Family status x Wages}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{Score}}} & Repayment \\
+\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {green} {\textbf<7>{Family status x Wages}} & \uncover<9->{\textcolor{green}{\textbf{Score}}} & Repayment \\
 \hline
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {OliveGreen} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{225}}} & 0  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {OliveGreen} {\textbf<7>{Union x ]1500;2000]}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{190}}} & 1  \\
-\arrayrulecolor{OliveGreen}\hline
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {OliveGreen} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{218}}} & 0  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {OliveGreen} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{202}}} & 1  \\
-\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
-\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {green} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<9->{\textcolor{green}{\textbf{225}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {green} {\textbf<7>{Union x ]1500;2000]}} & \uncover<9->{\textcolor{green}{\textbf{190}}} & 1  \\
+\arrayrulecolor{green}\hline
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{green}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{green}{\textbf{202}}} & 1  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
 \end{tabular}
 \end{tiny}
 \caption{\label{tab:exemple} Dataset with outliers and missing values.}
@@ -528,15 +530,15 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \centering
 \begin{tiny}
 \hspace*{-0.7cm}\begin{tabular}{p{2cm}|p{1.1cm}|p{1cm}|p{2.4cm}||p{0.6cm}|p{1cm}}
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {OliveGreen} {\textbf<7>{Family status x Wages}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{Score}}} & Repayment \\
+\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {green} {\textbf<7>{Family status x Wages}} & \uncover<9->{\textcolor{green}{\textbf{Score}}} & Repayment \\
 \hline
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {OliveGreen} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{225}}} & 0  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {OliveGreen} {\textbf<7>{Union x ]1500;2000]}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{190}}} & 1  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {green} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<9->{\textcolor{green}{\textbf{225}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {green} {\textbf<7>{Union x ]1500;2000]}} & \uncover<9->{\textcolor{green}{\textbf{190}}} & 1  \\
 \hline
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {OliveGreen} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{218}}} & 0  \\
-\textcolor <4,6> {OliveGreen} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {OliveGreen} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{OliveGreen}{\textbf{202}}} & 1  \\
-\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
-\textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {OliveGreen} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{green}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{green}{\textbf{202}}} & 1  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
 \end{tabular}
 \end{tiny}
 \caption{\label{tab:exemple} Dataset with outliers and missing values.}
@@ -546,18 +548,18 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \vspace{-0.5cm}
 \uncover<2->{
 \begin{enumerate}
-\item \textcolor <3> {OliveGreen} {\textbf<3>{Discarding rejected applicants}}
-\item \textcolor <4> {OliveGreen} {\textbf<4>{Feature selection}}
-\item \textcolor <5> {OliveGreen} {\textbf<5>{Discretization}} / \textcolor <6> {OliveGreen} {\textbf<6>{grouping}}
-\item \textcolor <7> {OliveGreen} {\textbf<7>{Interaction screening}}
-\item \textcolor <8> {OliveGreen} {\textbf<8>{Segmentation}}
-\item \textcolor <9> {OliveGreen} {\textbf<9>{Logistic regression fitting}}
+\item \textcolor <3> {green} {\textbf<3>{Discarding rejected applicants}}
+\item \textcolor <4> {green} {\textbf<4>{Feature selection}}
+\item \textcolor <5> {green} {\textbf<5>{Discretization}} / \textcolor <6> {green} {\textbf<6>{grouping}}
+\item \textcolor <7> {green} {\textbf<7>{Interaction screening}}
+\item \textcolor <8> {green} {\textbf<8>{Segmentation}}
+\item \textcolor <9> {green} {\textbf<9>{Logistic regression fitting}}
 \end{enumerate}
 }
 \end{frame}
 
 
-\subsection{Available data}
+\subsection{available data}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
@@ -935,19 +937,19 @@ y_n \tikzmarkend{e4} \\
 
 \section{Reject Inference}
 
-\subsection{Industrial setting}
+\subsection{industrial setting}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
 \begin{figure}[ht]
-\begin{minipage}[b]{0.45\linewidth}
+\begin{minipage}[c]{0.45\linewidth}
 \center \includegraphics[width=5cm]{figures/schema.png}
 \caption{Simplified Acceptance mechanism in~Crédit Agricole Consumer Finance}
 \label{fig:figure1}
 
 \end{minipage}%
-\hfil \begin{minipage}[b]{0.5\linewidth}
+\hfil \begin{minipage}[c]{0.5\linewidth}
 
 \center \includegraphics[width=5cm]{figures/camembert_invert.png}
 \caption{Proportion of ``final'' lending decisions for CACF France}
@@ -995,13 +997,13 @@ But we lack $\mathbf{y}_{\nf}$.
 		% The frame:
 		\draw[white, dashed, thin] (0,0) rectangle (7,7); 
 		% Agents:
-		\draw[fill=red]  
+		\draw[fill=orange]  
 			(5,2) circle (.1) % Firms
 			(2,2) circle (.1); % Households
 		% Flows:
-		\draw[-latex,thin, blue] 
+		\draw[-latex,thin, yellow] 
 			(2,2.2) to (2,4); % Labour Powers
-		\draw[-latex,thin, blue]
+		\draw[-latex,thin, yellow]
 			(4.85,1.85) to (4,1); % Wages
 		 % Labels:
 		\fill[white]
@@ -1010,18 +1012,18 @@ But we lack $\mathbf{y}_{\nf}$.
 			(2.1,1.9) node[below,scale=2]{$\theta^\star$}
 			(2.2,4.3) node [scale=2] {$\hat{\theta}$} 
 			(4.2,0.6) node [scale=2] {$\hat{\theta}_{\f}$};
-		\fill[blue]
+		\fill[yellow]
 			(1,3) node [scale=1] {Estimation}
             (1,2.7) node [scale=1] {bias+variance};
-		\fill[blue]
+		\fill[yellow]
 			(5.7,1.1) node [scale=1] {Estimation}
             (5.7,0.8) node [scale=1] {bias+variance};
 
 	\end{scope}
 	
 	% 2 vertical lines for linking agents on the 2 levels
-	\draw[thin, dashed, red](.8,1.75) to (3.8,-0.32);
-	\draw[thin, dashed, red](.8,1.75) to (.8,-1.8);
+	\draw[thin, dashed, orange](.8,1.75) to (3.8,-0.32);
+	\draw[thin, dashed, orange](.8,1.75) to (.8,-1.8);
 	
     % Draw right angle scheme
     \draw(.8,-1.6) to (1,-1.6);
@@ -1035,13 +1037,13 @@ But we lack $\mathbf{y}_{\nf}$.
 		yslant=\yslant,xslant=\xslant
 	]
 		 % Agents:
-		\draw [fill=olive]
+		\draw [fill=green]
 			(2,2) circle (.1); % Households
 		 % Labels:
 		\fill[black]
-			(2.2,2.4) node[right,scale=2]{\textcolor{olive}{$p(y|\bm{x})$}};
+			(2.2,2.4) node[right,scale=2]{\textcolor{green}{$p(y|\bm{x})$}};
 %			(4,2) node[right,scale=2]{\textcolor{olive}{$p(y|\bm{x}, z = \f)$}};
-        \fill[red]
+        \fill[orange]
 			(0.85,0.35) node [right, scale=1.5] {Model bias};	
 
 	\end{scope} 
@@ -1054,7 +1056,7 @@ But we lack $\mathbf{y}_{\nf}$.
 
 
 
-\subsection{Modelling the financing mechanism}
+\subsection{modelling the financing mechanism}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
@@ -1064,21 +1066,22 @@ Contrary to semi-supervised learning~\cite{chapelle2009semi}, labels $y$ are not
 \medskip
 
 \uncover<2->{
-Suppose there is some hidden financing mechanism belonging to a parametrized family ${p_{\bm{\phi}}(z | \bm{x}, y)}_{\bm{\phi} \in \bm{\Phi}}$.
+Suppose there is some hidden financing mechanism belonging to a parametrized family $\{p_{\bm{\phi}}(z | \bm{x}, y)\}_{\bm{\phi} \in \bm{\Phi}}$.
 }
 
 \medskip
 
 \uncover<3->{
 Combining ``acceptance'' and credit-worthiness probability distributions, we get:
-\[ p(y,z | \bm{x}) = p_{\bm{\theta}(\bm{\gamma})}(y | \bm{x}) p_{\bm{\phi}(\bm{\gamma})}(z | \bm{x}, y). \]
+\[ p_{\bm{\gamma}}(y,z | \bm{x}) = p_{\bm{\theta}(\bm{\gamma})}(y | \bm{x}) p_{\bm{\phi}(\bm{\gamma})}(z | \bm{x}, y). \]
 }
 
-\medskip
+%\medskip
 
 \uncover<4->{
 To estimate $\bm{\gamma}$, we could rely on Maximum Likelihood theory and maximize:
-\[ \ell(\bm{\gamma}; \mathcal{T}) = \sum_{i = 1}^n \ln p_{\bm{gamma}}(y_i,\f | \bm{x}_i) + \sum_{i=n'}^{n+n'} \ln \sum_{y \in \{0,1\}} p_{\bm{gamma}}(y,\nf | \bm{x}_i). \]
+\[ \ell(\bm{\gamma}; \mathcal{T}) = \sum_{i = 1}^n \ln p_{\bm{\gamma}}(y_i,\f | \bm{x}_i) + \sum_{i=n'}^{n+n'} \ln \sum_{y \in \{0,1\}} p_{\bm{\gamma}}(y,\nf | \bm{x}_i), \]
+\textit{e.g.}\ \textit{via} an EM algorithm.
 }
 
 \end{frame}
@@ -1088,7 +1091,7 @@ To estimate $\bm{\gamma}$, we could rely on Maximum Likelihood theory and maximi
 
 
 
-\subsection*{Missingness mechanism}
+\subsection*{missingness mechanism}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
@@ -1096,11 +1099,11 @@ To estimate $\bm{\gamma}$, we could rely on Maximum Likelihood theory and maximi
 \begin{itemize}
 \item \textbf{Ignorability}: no functional dependence between $\bm{\theta}$ and $\bm{\phi}$, \textit{e.g.}\ $\bm{\gamma} = (\bm{\theta},\bm{\phi})$.
 
-\item<2-> \textbf{MAR}: $\forall \: x,y,z, \; p(z| \bm{x},y) = p(z| \bm{x})$
+\item<2-> \textbf{MAR}: $\forall \: \bm{x},y,z, \; p(z| \bm{x},y) = p(z| \bm{x})$
 
 $\rightarrow$ Acceptance is determined by an old score: $Z = \mathds{1}_{\{\bm{\theta}'X > \text{cut}\}}$.
 
-\item<3-> \textbf{MNAR}: $\exists \: x,y,z, \; p(z| \bm{x},y) \neq p(z| \bm{x})$
+\item<3-> \textbf{MNAR}: $\exists \: \bm{x},y,z, \; p(z| \bm{x},y) \neq p(z| \bm{x})$
 
 $\rightarrow$ Operators' ‘‘feeling'' $\tilde{\bm{X}}$ influence the acceptance.
 
@@ -1135,7 +1138,7 @@ edges
 
 
 
-\subsection{Flawed model selection}
+\subsection{flawed model selection}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
@@ -1160,16 +1163,119 @@ It requires to precisely state the models $\{ p_{\bm{\gamma}}(y,z | \bm{x})\}_{\
 
 
 
-\subsection{Reject Inference strategies}
+\subsection{reject Inference strategies}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-We gathered 6 so-called Reject Inference methods from the literature~\cite{} that aim at re-injecting $\bm{\mathbf{x}}_{\nf}$ into the estimation procedure of $\hat{\bm{\theta}}$.
+We gathered 6 so-called Reject Inference methods from the literature~\cite{economix,saporta,RI6,banasik} that aim at re-injecting $\bm{\mathbf{x}}_{\nf}$ into the estimation procedure of $\hat{\bm{\theta}}$.
 
-6 stratégies, donner l'essence
+\medskip
+
+They usually resemble EM-like algorithms:
+
+\setbeamercolor{normal text}{fg=black}
+\usebeamercolor[fg]{normal text}
+
+\[ \hspace*{-0.8cm}\textcolor{white}{\mathcal{T}_{\text{c}}^{(1)} = {\Huge \Bigg(}}
+%\begin{array}{c}
+%\tikzmarkin[hor=style green]{el0} \mathbf{x}_{\f} \tikzmarkend{el0} \\
+%\\
+%\\
+%\tikzmarkin[hor=style green]{el-1} \mathbf{x}_{\nf} \tikzmarkend{el-1} \end{array}
+\textcolor{white}{{\Huge \Bigg(}}
+\begin{array}{ccc}
+\tikzmarkin[hor=style green]{el1} \; \; x_{1,1} & \cdots & x_{1,d}  \\
+ \vdots & \vdots & \vdots \\
+ x_{n,1} & \cdots & x_{n,d} \\
+ x_{n+1,1} & \cdots & x_{n+1,d}  \\
+ \vdots & \vdots & \vdots \\
+ x_{n+n',1} & \cdots & x_{n+n',d} \tikzmarkend{el1} \end{array} \textcolor{white}{{\Huge \Bigg)},}
+ %\hspace{0.2cm}
+% \begin{array}{c}
+%\tikzmarkin[hor=style green]{l1} \mathbf{y}_{\f} \tikzmarkend{l1}\\
+%\\
+%\\
+%\tikzmarkin[hor=style green]{l2} \mathbf{y}_{\nf} \tikzmarkend{l2} \end{array}
+\textcolor{white}{{\Huge \Bigg(}}
+\begin{array}{c}
+\tikzmarkin[hor=style green]{l3} \; \; y_1 \; \; \; \\
+\vdots \\
+ y_n \\ 
+ \hat{y}_{n+1}^{(1)} \\
+\vdots \\
+\hat{y}_{n+n'}^{(1)} \tikzmarkend{l3}\end{array} \textcolor{white}{{\Huge \Bigg)},}
+%\hspace{0.2cm} 
+% \begin{array}{c}
+%\tikzmarkin[hor=style green]{el111} \mathbf{z}_{\f} \tikzmarkend{el111}\\
+%\\
+%\\
+%\tikzmarkin[hor=style green]{el121} \mathbf{z}_{\nf} \tikzmarkend{el121}\end{array}
+\textcolor{white}{{\Huge \Bigg(}}
+\begin{array}{c}
+\tikzmarkin[hor=style green]{e41} \text{f} \\
+\vdots \\
+\text{f} \\ 
+\text{nf} \\
+\vdots \\
+\text{nf} \tikzmarkend{e41} \end{array} \textcolor{white}{{\Huge \Bigg) \Bigg)}}\]
+ 
+\setbeamercolor{normal text}{fg=white}
+\usebeamercolor[fg]{normal text}
 
 \end{frame}
+
+
+
+\subsection{theoretical findings}
+
+\begin{frame}
+\frametitle{\secname : \subsecname}
+
+Fuzzy augmentation and Twins produce the same coefficient $\hat{\bm{\theta}}_{\text{f}}$.
+
+\medskip
+
+Reclassification is equivalent to a Classification-EM algorithm, thus introducing a bias in the estimation of $\bm{\theta}^\star$.
+
+\begin{table}
+\caption{Summary of potential biases.}
+\begin{center}
+\begin{tabular}{L{2cm} | C{4cm} | C{4cm}}
+ & MAR & MNAR \\
+ \hline
+ Well-specified model & $\hat{\bm{\theta}}_{\text{f}}$ is asymptotically unbiased. & \multirowcell{2}{$\hat{\bm{\theta}}_{\text{f}}$ is asymptotically \\ biased. Any correction  \\ relies on \textit{a priori} \\ unverifiable assumptions \\ about $p_{\bm{\phi}}(z | \bm{x}, y)$.} \\
+ \cline{1-2}
+ Misspecified model & $\hat{\bm{\theta}}_{\text{f}}$ is asymptotically biased: the Augmentation method could be suitable but introduces a new estimation procedure. & \\
+\end{tabular}
+\end{center}
+\end{table}
+
+\end{frame}
+
+
+
+\subsection{some simulations}
+
+\begin{frame}
+\frametitle{\secname : \subsecname}
+
+\begin{figure}[!ht]
+\centering \resizebox{.8\textwidth}{!}{\input{CODE_FIGURES/electronics.tex}}
+\caption{Electronics loans dataset from CACF.}
+\label{fig:darty_reject}
+\end{figure}
+\vspace*{-1cm}
+\begin{figure}[!ht]
+\centering \resizebox{.8\textwidth}{!}{\input{CODE_FIGURES/standard.tex}}
+\caption{Standard loans dataset from CACF.}
+\label{fig:M3_reject}
+\end{figure}
+
+\end{frame}
+
+
+
 
 
 %\subsection{What is at stake?}
@@ -1326,59 +1432,59 @@ We gathered 6 so-called Reject Inference methods from the literature~\cite{} tha
 
 
 
-\begin{frame}
-\frametitle{\secname: \subsecname}
-
-For logistic regression, \textit{Reject Inference} methods amount to:
-\setbeamercolor{normal text}{fg=black}
-\usebeamercolor[fg]{normal text}
-\hspace*{-0.7cm} \[ \textcolor{white}{\mathcal{T}_{\text{c}}^{(1)} = } %\left(
-\begin{array}{c}
-\tikzmarkin[hor=style green]{el0} \mathbf{x}_{\f} \tikzmarkend{el0} \\
-\\
-\\
-\tikzmarkin[hor=style green]{el-1} \mathbf{x}_{\nf} \tikzmarkend{el-1} \end{array}
-%\left( 
-\begin{array}{ccc}
-\tikzmarkin[hor=style green]{el1} \; \; x_{1,1} & \cdots & x_{1,d}  \\
- \vdots & \vdots & \vdots \\
- x_{n,1} & \cdots & x_{n,d} \\
- x_{n+1,1} & \cdots & x_{n+1,d}  \\
- \vdots & \vdots & \vdots \\
- x_{n+n',1} & \cdots & x_{n+n',d} \tikzmarkend{el1} \end{array},
- \hspace{0.2cm}
- \begin{array}{c}
-\tikzmarkin[hor=style green]{l1} \mathbf{y}_{\f} \tikzmarkend{l1}\\
-\\
-\\
-\tikzmarkin[hor=style green]{l2} \mathbf{y}_{\nf} \tikzmarkend{l2} \end{array}
-%\left( 
-\begin{array}{c}
-\tikzmarkin[hor=style green]{l3} \; \; y_1 \; \; \; \\
-\vdots \\
- y_n \\ 
- \hat{y}_{n+1}^{(1)} \\
-\vdots \\
-\hat{y}_{n+n'}^{(1)} \tikzmarkend{l3}\end{array},
-\hspace{0.2cm} 
- \begin{array}{c}
-\tikzmarkin[hor=style green]{el111} \mathbf{z}_{\f} \tikzmarkend{el111}\\
-\\
-\\
-\tikzmarkin[hor=style green]{el121} \mathbf{z}_{\nf} \tikzmarkend{el121}\end{array}
-%\left( 
-\begin{array}{c}
-\tikzmarkin[hor=style green]{e41} \text{f} \\
-\vdots \\
-\text{f} \\ 
-\text{nf} \\
-\vdots \\
-\text{nf} \tikzmarkend{e41} \end{array}.\]
- 
-\setbeamercolor{normal text}{fg=white}
-\usebeamercolor[fg]{normal text}
-
-\end{frame}
+%\begin{frame}
+%\frametitle{\secname: \subsecname}
+%
+%They usually amount to EM-like algorithms:
+%\setbeamercolor{normal text}{fg=black}
+%\usebeamercolor[fg]{normal text}
+%\hspace*{-0.7cm} \[ \textcolor{white}{\mathcal{T}_{\text{c}}^{(1)} = } %\left(
+%\begin{array}{c}
+%\tikzmarkin[hor=style green]{el0} \mathbf{x}_{\f} \tikzmarkend{el0} \\
+%\\
+%\\
+%\tikzmarkin[hor=style green]{el-1} \mathbf{x}_{\nf} \tikzmarkend{el-1} \end{array}
+%%\left( 
+%\begin{array}{ccc}
+%\tikzmarkin[hor=style green]{el1} \; \; x_{1,1} & \cdots & x_{1,d}  \\
+% \vdots & \vdots & \vdots \\
+% x_{n,1} & \cdots & x_{n,d} \\
+% x_{n+1,1} & \cdots & x_{n+1,d}  \\
+% \vdots & \vdots & \vdots \\
+% x_{n+n',1} & \cdots & x_{n+n',d} \tikzmarkend{el1} \end{array},
+% \hspace{0.2cm}
+% \begin{array}{c}
+%\tikzmarkin[hor=style green]{l1} \mathbf{y}_{\f} \tikzmarkend{l1}\\
+%\\
+%\\
+%\tikzmarkin[hor=style green]{l2} \mathbf{y}_{\nf} \tikzmarkend{l2} \end{array}
+%%\left( 
+%\begin{array}{c}
+%\tikzmarkin[hor=style green]{l3} \; \; y_1 \; \; \; \\
+%\vdots \\
+% y_n \\ 
+% \hat{y}_{n+1}^{(1)} \\
+%\vdots \\
+%\hat{y}_{n+n'}^{(1)} \tikzmarkend{l3}\end{array},
+%\hspace{0.2cm} 
+% \begin{array}{c}
+%\tikzmarkin[hor=style green]{el111} \mathbf{z}_{\f} \tikzmarkend{el111}\\
+%\\
+%\\
+%\tikzmarkin[hor=style green]{el121} \mathbf{z}_{\nf} \tikzmarkend{el121}\end{array}
+%%\left( 
+%\begin{array}{c}
+%\tikzmarkin[hor=style green]{e41} \text{f} \\
+%\vdots \\
+%\text{f} \\ 
+%\text{nf} \\
+%\vdots \\
+%\text{nf} \tikzmarkend{e41} \end{array}.\]
+% 
+%\setbeamercolor{normal text}{fg=white}
+%\usebeamercolor[fg]{normal text}
+%
+%\end{frame}
 
  
  
@@ -1463,7 +1569,7 @@ For logistic regression, \textit{Reject Inference} methods amount to:
 \section{Feature quantization}
 
 
-\subsection{By an example}
+\subsection{by an example}
 
 {
 \setbeamercolor{background canvas}{bg=white}
@@ -1480,7 +1586,7 @@ For logistic regression, \textit{Reject Inference} methods amount to:
 }
 
 
-\subsection{Some more notations}
+\subsection{some more notations}
 
 \begin{frame}[allowframebreaks]
 \frametitle{\secname: \subsecname}
@@ -1503,7 +1609,8 @@ For logistic regression, \textit{Reject Inference} methods amount to:
 \begin{align*}
 \q(\bx) & = (\q_1(x_1),\dots,\q_d(x_d)) \\
 \q_j(x_j) & = (\s_{j,h}(x_j))_1^{m_j} \text{ (one-hot encoding)} \\
-\s_{j,h}(\cdot) & =  1 \text{ if } x_j \in C_{j,h}, 0 \text{ otherwise, } 1 \leq h \leq m_j
+\s_{j,h}(\cdot) & = \mathds{1}(x_j \in C_{j,h}), 1 \leq h \leq m_j
+%\s_{j,h}(\cdot) & =  1 \text{ if } x_j \in C_{j,h}, 0 \text{ otherwise, } 1 \leq h \leq m_j
 \end{align*}
 \vspace*{-0.7cm}
 \end{block}
@@ -1587,16 +1694,16 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 
 
 
-\subsection{Existing approaches}
+\subsection{existing approaches}
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
-\vspace*{-0.1cm}
+\vspace*{-0.25cm}
 \begin{center}
-\includegraphics[scale=0.25]{figures/taxonomy.PNG}
+\includegraphics[scale=0.3]{figures/taxonomy.PNG}
 \end{center}
-
-These approaches maximize an \textit{ad hoc} criterion:
+\vspace*{-0.2cm}
+These approaches (\cite{wrapper2}) maximize an \textit{ad hoc} criterion:
 \vspace*{-0.1cm}
 \[ \hat{\q} = \argmax_{\q} \text{CRIT}(\mathcal{T}_\f), \]
 \vspace*{-0.1cm}
@@ -1610,7 +1717,7 @@ and {\bf hope} that it's aligned with your original goal:
 
 
 
-\subsection{Approximation}
+\subsection{approximation}
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
@@ -1622,9 +1729,10 @@ and {\bf hope} that it's aligned with your original goal:
 
 \textbf{For continuous features}, we set for $\bm{\alpha}_{j,h} = (\alpha^0_{j,h},\alpha^1_{j,h}) \in \mathbb{R}^2$
 \[\s_{\ag_{j,h}}(\cdot) = \frac{\exp(\alpha^0_{j,h} + \alpha^1_{j,h}  \cdot)}{\sum_{g=1}^{m_j} \exp(\alpha^0_{j,g} + \alpha^1_{j,g}  \cdot)}.\]
+}
+\uncover<3->{
 \textbf{For categorical features}, we set for $\bm{\alpha}_{j,h}=\left(\alpha_{j,h}(1),\ldots, \alpha_{j,h}(l_j)\right) \in \mathbb{R}^{l_j}$
 \[\s_{\ag_{j,h}}(\cdot) = \frac{\exp\left(\alpha_{j,h}(\cdot)\right)}{\sum_{g=1}^{m_j} \exp\left(\alpha_{j,g}(\cdot)\right)}.\]
-
 }
 
 \end{frame}
@@ -1633,9 +1741,10 @@ and {\bf hope} that it's aligned with your original goal:
 
 
 
-\subsection{Estimation MAP}
+\subsection{estimation MAP}
 \begin{frame}
 \frametitle{\secname : \subsecname}
+\vspace*{-0.2cm}
 
 \[ \hat{\s}_{j,h}(x_j) = 1 \text{ if } h = \argmax_{1 \leq h' \leq m_j} \s_{\hat{\ag}_{j,h'}}, 0 \text{ otherwise.} \]
 
@@ -1727,13 +1836,13 @@ and {\bf hope} that it's aligned with your original goal:
 
 
 
-\subsection{Neural networks}
+\subsection{neural networks}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
 We wish to maximize the following likelihood:
-\[ (\hat{\bm{\theta}}, \hat{\bm{\alpha}}) = \argmax_{\bm{\theta}, \bm{\alpha}} \ell(\bm{\theta}, \bm{\alpha} ; \bm{x}, \bm{y}) = \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i | \q_{\alpha}(\bm{x}_i)). \]
+\[ (\hat{\bm{\theta}}, \hat{\bm{\alpha}}) = \argmax_{\bm{\theta}, \bm{\alpha}} \ell(\bm{\theta}, \bm{\alpha} ; \bm{x}, \bm{y}) = \argmax_{\bm{\theta}, \bm{\alpha}} \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i | \q_{\alpha}(\bm{x}_i)). \]
 
 \medskip
 
@@ -1838,8 +1947,8 @@ We wish to maximize the following likelihood:
 
 
 
-\begin{frame}
-\frametitle{\secname: \subsecname}
+%\begin{frame}
+%\frametitle{\secname: \subsecname}
 
 % \newlength\figureheight
 % \newlength\figurewidth
@@ -1866,19 +1975,20 @@ We wish to maximize the following likelihood:
 %    \caption{\label{fig:MAP} Quantizations $\hat{\q}^{(s)}_1({x}_1)$ of experiment (a) resulting from the thresholding (\ref{eq:ht}).}
 %\end{figure}
 
-\end{frame}
+%\end{frame}
 
 
 
 \newlength\figureheight
 \newlength\figurewidth
-\setlength\figureheight{8cm}
-\setlength\figurewidth{11cm}
+\setlength\figureheight{7cm}
+\setlength\figurewidth{12cm}
  
 \begin{frame}
-\frametitle{\secname}
+\frametitle{\secname: \subsecname}
 
 \begin{figure}
+\hspace*{-1cm}
 \begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{3}
 \multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_NN/feature_0_iteration_\i.tex}}%
 \end{animateinline}
@@ -1888,20 +1998,20 @@ We wish to maximize the following likelihood:
 
 
 
-\subsection{Model = quantization selection}
+\subsection{model = quantization selection}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
 \begin{block}{New model selection criterion}
-We have drastically restricted the search space to clever candidates $\hat{\q}^(1), \ldots, \hat{\q}^{(\text{iter})}$ resulting from the the gradient descent steps.
-\[ (\q^\star,\bth^\star) = \argmin_{\textcolor{red}{\hat{\q} \in \{\hat{\q}^{(1)}, \ldots, \hat{\q}^{(\text{iter})}\}},\bth \in \bm{\Theta}_{\textcolor{red}{\bm{m}}}} \text{BIC}(\hat{\bth}_{\hat{\q}}) \]
+We have drastically restricted the search space to iter well-chosen candidates resulting from the the gradient descent steps.
+\[ (\q^\star,\bth^\star) = \argmin_{\textcolor{yellow}{\hat{\q} \in \{\hat{\q}^{(1)}, \ldots, \hat{\q}^{(\text{iter})}\}},\bth \in \bm{\Theta}_{\textcolor{yellow}{\bm{m}}}} \text{BIC}(\hat{\bth}_{\hat{\q}}) \]
 \end{block}
 
 \medskip
 
 \uncover<2->{
-We would still need to loop over candidates $\textcolor{red}{\bm{m}}$!
+We would still need to loop over candidates $\textcolor{yellow}{\bm{m}}$!
 }
 
 \medskip
@@ -2082,7 +2192,7 @@ Start with $\bm{m} = (m_{\text{max}})_1^d$ and ``wait'' \dots
 
 
 
-\subsection{Results}
+\subsection{results}
 
 \begin{frame}
 
@@ -2150,7 +2260,7 @@ CACF data
     \centering
         \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc}, the two baselines of Table~\ref{tab:banchmark} and the current scorecard (manual / expert representation) obtained on several portfolios of Cr\'edit Agricole Consumer Finance.}
     \label{tab:real_data}
-\resizebox{.9\textwidth}{!}{\begin{tabular}{lllll}
+\resizebox{.86\textwidth}{!}{\begin{tabular}{lllll}
 Portfolio & ALLR & Current & MDLP/$\chi^2$ & \textit{glmdisc} \\
 \hline
 Automobile & \textcolor{green}{59.3} (3.1) & 55.6 (3.4) & \textcolor{green}{59.3} (3.0) & 58.9 (2.6) \\
@@ -2173,17 +2283,17 @@ Electronics & 52.9 (11.9) & 55.8 (10.8) & 56.3 (10.2)  & \textcolor{green}{72.6}
 
 \section{Bivariate interactions}
 
-\subsection{Notations}
+\subsection{notations}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
-Upper triangular matrix with $\delta_{k,\ell} = 1 $ if $k < \ell$ and features p and q ``interact'' in the logistic regression.
+Upper triangular matrix with $\delta_{k,\ell} = 1 $ if $k < \ell$ and features $k$ and $\ell$ ``interact'' in the logistic regression.
 \[ \text{logit}(p_{\bm{\theta}}(1|\q(\bm{x}))) = \theta_0 + \sum_{j=1}^{d} \theta_j^{\q_j(x_j)} + \sum_{1\leq k < \ell \leq d} \delta_{k,\ell} \theta_{k,\ell}^{\q_k(x_k) f_{\ell}(x_{\ell})} \]
 \uncover<2->{
 Imagine for now that the discretization $\q(\bm{x})$ is fixed. The criterion becomes:
 \begin{align*}
-(\bm{\theta}^\star,\bm{\delta}^\star) & = \argmax_{\bm{\theta},\textcolor{red}{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}}} \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i|\q(\bm{x}_i),\bm{\delta}) - \text{penalty}(n;\bm{\theta}) 
+(\bm{\theta}^\star,\bm{\delta}^\star) & = \argmax_{\bm{\theta},\textcolor{yellow}{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}}} \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i|\q(\bm{x}_i),\bm{\delta}) - \text{penalty}(n;\bm{\theta}) 
 \end{align*}
 }
 \uncover<3->{
@@ -2193,7 +2303,7 @@ Analogous to previous problem: $2^{\frac{d(d-1)}{2}}$ models.
 
 \end{frame}
 
-\subsection{Model proposal}
+\subsection{model proposal}
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
@@ -2204,7 +2314,7 @@ $\delta$ is latent and hard to optimize over: use a stochastic algorithm!
 \uncover<2->{
 Strategy used here: Metropolis-Hastings sampling algorithm.
 
-{\bf Idea:} Propose ``clever'' interactions and accept / reject them based on the BIC criterion of the resulting logistic regression.
+{\bf Idea:} propose well-chosen interactions and accept / reject them based on the BIC criterion of the resulting logistic regression.
 }
 
 \only<3>{
@@ -2216,7 +2326,7 @@ p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) p(\bm{\delta}
 \uncover<4->{
 \begin{align*}
 p(y| \bqk ) & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \bqk, \bm{\delta}) p(\bm{\delta}) \\
-p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) \textcolor{red}{\cancel{p(\bm{\delta})}} \hspace{1cm} p(\delta_{p,q}) = \frac{1}{2}
+p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) \textcolor{yellow}{\cancel{p(\bm{\delta})}} \hspace{1cm} p(\delta_{p,q}) = \frac{1}{2}
 \end{align*}
 }
 \uncover<5->{
@@ -2239,13 +2349,13 @@ $2^{d(d-1)}$ probabilities to calculate\dots
 \bigskip
 
 \uncover<3->{
-\textbf{Proposal:} gain/loss in BIC between \textcolor{red}{bivariate} models \textcolor{red}{with} / \textcolor{red}{without} the interaction.
+\textbf{Proposal:} gain/loss in BIC between \textcolor{yellow}{bivariate} models \textcolor{yellow}{with} / \textcolor{yellow}{without} the interaction.
 }
 
 \bigskip
 
 \uncover<4->{
-If the interaction between two features is meaningful when only these two features are considered, there is a (provably) good chance that it will be in the full multivariate model.
+If the interaction between two features is meaningful when only these two features are considered, there is a provably good chance that it will be in the full multivariate model.
 }
 
 \bigskip
@@ -2264,7 +2374,7 @@ If the interaction between two features is meaningful when only these two featur
 
 
 
-\subsection{Results}
+\subsection{results}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
@@ -2273,7 +2383,7 @@ Données UCI
 
 \begin{table}
     \centering
-        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc} and two baselines: ALLR and MDLP / $\chi^2$ tests obtained on several benchmark datasets from the UCI library.}
+        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc} and two baselines.}
     \label{tab:banchmark_inter}
 \begin{tiny}
 \begin{tabular}{llllll}
@@ -2300,7 +2410,7 @@ Medicine data
 
 \begin{table}[t]
 \begin{center}
-\caption{Gini indices of our proposed quantization algorithm \textit{glmdisc}-SEM and two baselines: ALLR and ALLR with all pairwise interactions on several medicine-related benchmark datasets.}
+\caption{Gini indices of our proposed quantization algorithm \textit{glmdisc}-SEM and two baselines.}
 \label{tab:banchmark_medicine}
 \begin{adjustbox}{max width=0.99\textwidth}
 \begin{tabular}{rrrrr}
@@ -2328,7 +2438,7 @@ CACF data
 
 \begin{table}
     \centering
-        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc}, the two baselines of Table~\ref{tab:banchmark} and the current scorecard (manual / expert representation) obtained on several portfolios of Cr\'edit Agricole Consumer Finance.}
+        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc}, the two baselines and the current scorecard.}
     \label{tab:real_data_inter}
 \begin{tiny}
 \begin{tabular}{lllllll}
@@ -2361,12 +2471,12 @@ Older results
 \begin{tabular}{|c||c|c|c|c|}
 \hline  Gini & Current performance & \textbf{glmdisc} & Basic \textbf{glm} \\
 \hline
-\hline   Auto (n=50,000 ; d=15) & 57.9 & \textcolor{OliveGreen}{64.84} & 58\\
-\hline   Revolving (n=48,000 ; d=9) & 58.57 & \textcolor{OliveGreen}{67.15} & 53.5 \\
-\hline   Prospects (n=5,000 ; d=25) & 35.6 & \textcolor{OliveGreen}{47.18} & 32.7\\
-\hline   Electronics (n=140,000 ; d=8) & \textcolor{OliveGreen}{57.5} & \textcolor{OliveGreen}{58} & -10 \\
-\hline   Young (n=5,000 ; d=25) & $\approx$ 15 & \textcolor{OliveGreen}{30} & 12.2 \\
-\hline   Basel II (n=70,000 ; d=13) & \textcolor{OliveGreen}{70} & \textcolor{OliveGreen}{71.3} & 19 \\
+\hline   Auto (n=50,000 ; d=15) & 57.9 & \textcolor{green}{64.84} & 58\\
+\hline   Revolving (n=48,000 ; d=9) & 58.57 & \textcolor{green}{67.15} & 53.5 \\
+\hline   Prospects (n=5,000 ; d=25) & 35.6 & \textcolor{green}{47.18} & 32.7\\
+\hline   Electronics (n=140,000 ; d=8) & \textcolor{green}{57.5} & \textcolor{green}{58} & -10 \\
+\hline   Young (n=5,000 ; d=25) & $\approx$ 15 & \textcolor{green}{30} & 12.2 \\
+\hline   Basel II (n=70,000 ; d=13) & \textcolor{green}{70} & \textcolor{green}{71.3} & 19 \\
 \hline 
 \end{tabular}
 
@@ -2399,7 +2509,7 @@ Older results
   [
     sibling distance        = 15em,
     level distance          = 5em,
-    edge from parent/.style = {draw, -latex},
+    edge from parent/.style = {draw = black, -latex},
     every node/.style       = {font=\footnotesize},
     sloped
   ]
@@ -2450,16 +2560,16 @@ Older results
 \myGlobalTransformation{0}{0};
 
 % pauvres
-\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x};
-\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x+2.5};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=-3:1]{rand+x+2.5};
 
 %moyens
-\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=2:6]{rand+x};
-\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=2:6]{rand+x+2.5};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=2:6]{rand+x};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=2:6]{rand+x+2.5};
 
 %riches
-\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=7:11]{rand+x};
-\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=7:11]{rand+x+2.5};
+\addplot [green, only marks, mark=*, samples=300, mark size=0.75,domain=7:11]{rand+x};
+\addplot [red, only marks, mark=*, samples=300, mark size=0.75,domain=7:11]{rand+x+2.5};
 
 %frontière
 \addplot [white, very thick, domain=-3:11] {x+1.25};
@@ -2540,7 +2650,7 @@ Older results
 
 
 
-\subsection{Notations}
+\subsection{notations}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
@@ -2571,7 +2681,7 @@ where $\hat{\bm{\theta}}^c$ is the MLE of the logistic regression of segment $c$
 
 
 
-\subsection{Model proposal}
+\subsection{model proposal}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
@@ -2604,7 +2714,7 @@ Similarly to the quantization proposal: ability to be in several segments at a t
 
 \end{frame}
 
-\subsection{Some results}
+\subsection{some results}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
@@ -2614,7 +2724,7 @@ Similarly to the quantization proposal: ability to be in several segments at a t
 \begin{tabular}{ll|lllll}
  & Oracle = ALLR & \textit{glmtree}-SEM & FAMD & PLS & LMT & MOB \\
 \hline
-Gini & 69.7 & \textbf{69.7} & 65.3 & 47.0 & \textbf{69.7} & 64.8 \\
+Gini & 69.7 & \textcolor{green}{\textbf{69.7}} & 65.3 & 47.0 & \textcolor{green}{\textbf{69.7}} & 64.8 \\
 \end{tabular}
 \end{table}
 
@@ -2625,7 +2735,7 @@ Gini & 69.7 & \textbf{69.7} & 65.3 & 47.0 & \textbf{69.7} & 64.8 \\
 \begin{tabular}{ll|llllll}
  & Oracle & ALLR & \textit{glmtree}-SEM & FAMD & PLS & LMT & MOB \\
 \hline
-Gini & 69.7 & 25.8 & \textbf{69.7} & 17.7 & 48.4 & 65.8 & \textbf{69.7} \\
+Gini & 69.7 & 25.8 & \textcolor{green}{\textbf{69.7}} & 17.7 & 48.4 & 65.8 & \textcolor{green}{\textbf{69.7}} \\
 \end{tabular}
 \end{table}
 
