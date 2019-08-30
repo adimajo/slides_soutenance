@@ -683,7 +683,7 @@ y_n \tikzmarkend{e4} \\
 
 \uncover<3->{
 %Example: logistic regression 
-\[ \ln \frac{p_{\bm{\theta}}(1 | \bm{x})}{(1 - p_{\bm{\theta}}(1 | \bm{x}))} = (1,\bm{x})' \bm{\theta}. \]
+\[ \ln \frac{p_{\bm{\theta}}(1 | \bm{x})}{1 - p_{\bm{\theta}}(1 | \bm{x})} = (1,\bm{x})' \bm{\theta}. \]
 }
 
 %\medskip
@@ -1061,7 +1061,7 @@ But we lack $\mathbf{y}_{\nf}$.
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-Contrary to semi-supervised learning~\cite{chapelle2009semi}, labels $y$ are not MCAR.
+Due to the acceptance mechanism, labels $y$ are not MCAR.
 
 \medskip
 
@@ -1105,9 +1105,9 @@ $\rightarrow$ Acceptance is determined by an old score: $Z = \mathds{1}_{\{\bm{\
 
 \item<3-> \textbf{MNAR}: $\exists \: \bm{x},y,z, \; p(z| \bm{x},y) \neq p(z| \bm{x})$
 
-$\rightarrow$ Operators' ‘‘feeling'' $\tilde{\bm{X}}$ influence the acceptance.
+$\rightarrow$ Operators' hidden ``feeling'' features $\tilde{\bm{X}}$ influence the acceptance.
 
-$\rightarrow$ Expert rules based on features $\tilde{\bm{X}}$ not in $\bm{X}$.
+$\rightarrow$ Expert rules based on both present and hidden features $\bm{X}$ and $\tilde{\bm{X}}$ resp.\ where $\tilde{\bm{X}}$ cannot be totally explained by $\bm{X}$.
 \end{itemize}
 
 \uncover<4->{
@@ -1703,9 +1703,9 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \includegraphics[scale=0.3]{figures/taxonomy.PNG}
 \end{center}
 \vspace*{-0.2cm}
-These approaches (\cite{wrapper2}) maximize an \textit{ad hoc} criterion:
+These approaches (\cite{wrapper2}) maximize an ``intermediary'' criteria, \textit{e.g.}\ \chi^2:
 \vspace*{-0.1cm}
-\[ \hat{\q} = \argmax_{\q} \text{CRIT}(\mathcal{T}_\f), \]
+\[ \hat{\q}_j = \argmax_{\q_j} \chi^2(\q_j(\mathbf{x}_\text{f}), \mathbf{y}_\text{f}), \]
 \vspace*{-0.1cm}
 and {\bf hope} that it's aligned with your original goal:
 \vspace*{-0.1cm}
@@ -2004,8 +2004,8 @@ We wish to maximize the following likelihood:
 \frametitle{\secname : \subsecname}
 
 \begin{block}{New model selection criterion}
-We have drastically restricted the search space to iter well-chosen candidates resulting from the the gradient descent steps.
-\[ (\q^\star,\bth^\star) = \argmin_{\textcolor{yellow}{\hat{\q} \in \{\hat{\q}^{(1)}, \ldots, \hat{\q}^{(\text{iter})}\}},\bth \in \bm{\Theta}_{\textcolor{yellow}{\bm{m}}}} \text{BIC}(\hat{\bth}_{\hat{\q}}) \]
+We have drastically restricted the search space to \textit{iter} well-chosen candidates resulting from the the gradient descent steps.
+\[ (\q^\star,\bth^\star) = \argmin_{\textcolor{yellow}{\hat{\q} \in \{\hat{\q}^{(1)}, \ldots, \hat{\q}^{(\textit{iter})}\}},\bth \in \bm{\Theta}_{\textcolor{yellow}{\bm{m}}}} \text{BIC}(\hat{\bth}_{\hat{\q}}) \]
 \end{block}
 
 \medskip
@@ -2355,7 +2355,7 @@ $2^{d(d-1)}$ probabilities to calculate\dots
 \bigskip
 
 \uncover<4->{
-If the interaction between two features is meaningful when only these two features are considered, there is a provably good chance that it will be in the full multivariate model.
+If the interaction between two features is meaningful when only these two features are considered, there is a good chance that it will be in the full multivariate model.
 }
 
 \bigskip
@@ -2665,15 +2665,22 @@ $c \in \{1, \dots, K\}$: latent feature of the client's segment.
 
 \medskip
 
+\uncover<2->{
+$\mathbf{c} = (c_1, \dots, c_n)$: segment for all $n$ clients.
+}
+
+
+\medskip
+
 \uncover<3->{
-We suppose there is a true segmentation $c^\star, K^\star$ and logistic regressions $\bm{\theta}^{\star, c^\star}$ at its leaves.
+We suppose there is a true segmentation $K^\star, \mathbf{c}^\star$ and logistic regressions $\bm{\theta}^{\star, c^\star}$ at its leaves.
 }
 
 \medskip
 
 \uncover<4->{
 If we could evaluate all segmentations, the best one could be selected by
-\[ (\hat{c}, \hat{K}) = \argmax_{c,K} \sum_{c=1}^K \text{BIC}(\hat{\bm{\theta}}^c),\]
+\[ (\hat{K}, \hat{\mathbf{c}}) = \argmax_{K,\mathbf{c}} \sum_{c=1}^K \text{BIC}((\bm{x}_i,y_i) | c_{i} = c};{\bm{\theta}^{c}),\]
 where $\hat{\bm{\theta}}^c$ is the MLE of the logistic regression of segment $c$.
 }
 
@@ -2703,7 +2710,7 @@ Similarly to the quantization proposal: ability to be in several segments at a t
 \medskip
 
 \uncover<4->{
-\[ \bm{\theta}^{c(s+1)} = \argmax_{\bm{\theta}^c} \sum_{i=1}^n \mathds{1}_{c}(c_i^{s+1)}) \ln p_{\bm{\theta}^c}(y_i | \bm{x}_i ; c). \]
+\[ \bm{\theta}^{c(s+1)} = \argmax_{\bm{\theta}^c} \sum_{i=1}^n \mathds{1}_{c}(c_i^{s+1)}) \ln p_{\bm{\theta}^c}(y_i | \bm{x}_i ; c_i). \]
 }
 
 \medskip
