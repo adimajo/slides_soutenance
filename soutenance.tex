@@ -1072,7 +1072,7 @@ Suppose there is some hidden financing mechanism belonging to a parametrized fam
 \medskip
 
 \uncover<3->{
-Combining ``acceptance'' and credit-worthiness probability distributions, we get:
+Combining financing and credit-worthiness probability distributions, we get:
 \[ p_{\bm{\gamma}}(y,z | \bm{x}) = p_{\bm{\theta}(\bm{\gamma})}(y | \bm{x}) p_{\bm{\phi}(\bm{\gamma})}(z | \bm{x}, y). \]
 }
 
@@ -1101,11 +1101,11 @@ To estimate $\bm{\gamma}$, we could rely on Maximum Likelihood theory and maximi
 
 \item<2-> \textbf{MAR}: $\forall \: \bm{x},y,z, \; p(z| \bm{x},y) = p(z| \bm{x})$
 
-$\rightarrow$ Acceptance is determined by an old score: $Z = \mathds{1}_{\{\bm{\theta}'X > \text{cut}\}}$.
+$\rightarrow$ Financing is determined by an old score: $Z = \mathds{1}_{\{\bm{\theta}'X > \text{cut}\}}$.
 
 \item<3-> \textbf{MNAR}: $\exists \: \bm{x},y,z, \; p(z| \bm{x},y) \neq p(z| \bm{x})$
 
-$\rightarrow$ Operators' hidden ``feeling'' features $\tilde{\bm{X}}$ influence the acceptance.
+$\rightarrow$ Operators' hidden ``feeling'' features $\tilde{\bm{X}}$ influence the financing.
 
 $\rightarrow$ Expert rules based on both present and hidden features $\bm{X}$ and $\tilde{\bm{X}}$ resp.\ where $\tilde{\bm{X}}$ cannot be totally explained by $\bm{X}$.
 \end{itemize}
@@ -1163,12 +1163,12 @@ It requires to precisely state the models $\{ p_{\bm{\gamma}}(y,z | \bm{x})\}_{\
 
 
 
-\subsection{reject Inference strategies}
+\subsection{reject inference strategies}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-We gathered 6 so-called Reject Inference methods from the literature~\cite{economix,saporta,RI6,banasik} that aim at re-injecting $\bm{\mathbf{x}}_{\nf}$ into the estimation procedure of $\hat{\bm{\theta}}$.
+We gathered 6 so-called Reject Inference methods from the literature~\cite{economix,saporta,RI6,banasik} that aim at re-injecting $\bm{\mathbf{x}}_{\nf}$ into the estimation procedure of $\bm{\theta}$.
 
 \medskip
 
@@ -1236,7 +1236,7 @@ Fuzzy augmentation and Twins produce the same coefficient $\hat{\bm{\theta}}_{\t
 
 \medskip
 
-Reclassification is equivalent to a Classification-EM algorithm, thus introducing a bias in the estimation of $\bm{\theta}^\star$.
+Reclassification is equivalent to a Classification-EM algorithm, thus introducing a bias in the estimation of $\bm{\theta}$.
 
 \begin{table}
 \caption{Summary of potential biases.}
@@ -1690,12 +1690,11 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \begin{block}{Oracle}
 \vspace*{-0.4cm}
 \begin{align*}
-\bm{\theta}^\star, \q^\star = & \argmax \mathbb{E}_{\bm{x},y} ln p_{\bm{\theta}}(y \q(\bm{x})) \\
-\bm{\theta}^{\text{BIC}}, \q^{\text{BIC}} = & \argmin_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \text{BIC}(\bm{\theta}; \bm{\mathbf{y}}_\f, \q(\bm{\mathbf{x}_\f))
+\bm{\theta}^\star, \q^\star = & \argmax_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \mathbb{E}_{\bm{x},y} \ln p_{\bm{\theta}}(y | \q(\bm{x})) \\
+\hat{\bm{\theta}}^{\text{BIC}}, \hat{\q}^{\text{BIC}} = & \argmin_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \text{BIC}(\bm{\theta}; \bm{\mathbf{y}}_{\text{f}}, \q(\bm{\mathbf{x}}_{\text{f}}))
 \end{align*}
 \vspace*{-0.2cm}
 \end{block}
-
 
 \end{frame}
 
@@ -1713,13 +1712,13 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \includegraphics[scale=0.3]{figures/taxonomy.PNG}
 \end{center}
 \vspace*{-0.2cm}
-These approaches (\cite{wrapper2}) maximize an ``intermediary'' criterion, \textit{e.g.}\ $\chi^2$:
+These approaches (\cite{wrapper2}) maximize an ``intermediary'' criterion, \textit{e.g.}:
 \vspace*{-0.1cm}
-\[ \hat{\q}_j^{\chi^2} = \argmax_{\q_j} \chi^2(\q_j(\mathbf{x}_\text{f}), \mathbf{y}_\text{f}), \]
+\[ \hat{\q}_j^{\chi^2} = \argmax_{\q_j} \chi^2(\q_j(\mathbf{x}_\text{f}), \mathbf{y}_\text{f}) \stackrel{?}{\approx} \q^\star, \]
 \vspace*{-0.1cm}
 and we {\bf hope} that it's aligned with our original goal s.t.:
 \vspace*{-0.1cm}
-\[ \hat{\bm{\theta}}_{\hat{\q}^{\chi^2}} = \argmax_{\bm{\theta}_{\hat{\q}^{\chi^2}}} \ell(\bm{\theta}_{\hat{\q}^{\chi^2}} ; \mathcal{T}_\f) \stackrel{?}{\approx} \bm{\theta}^\star, \q^\star. \]
+\[ \hat{\bm{\theta}}^{\chi^2} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathbf{y}_\text{f}, {\hat{\q}^{\chi^2}}((\mathbf{x}_\text{f}))) \stackrel{?}{\approx} \bm{\theta}^\star. \]
 
 \end{frame}
 
@@ -1999,7 +1998,7 @@ We wish to maximize the following likelihood:
 
 \begin{figure}
 \hspace*{-1cm}
-\begin{animateinline}[poster=first, controls=all, buttonfg=white]{3}
+\begin{animateinline}[poster=first, controls, buttonfg=white]{3}
 \multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_NN/feature_0_iteration_\i.tex}}%
 \end{animateinline}
 \end{figure}
