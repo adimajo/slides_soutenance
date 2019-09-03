@@ -1687,6 +1687,16 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \end{tikzpicture}
 \end{center}
 
+\begin{block}{Oracle}
+\vspace*{-0.4cm}
+\begin{align*}
+\bm{\theta}^\star, \q^\star = & \argmax \mathbb{E}_{\bm{x},y} ln p_{\bm{\theta}}(y \q(\bm{x})) \\
+\bm{\theta}^{\text{BIC}}, \q^{\text{BIC}} = & \argmin_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \text{BIC}(\bm{\theta}; \bm{\mathbf{y}}_\f, \q(\bm{\mathbf{x}_\f))
+\end{align*}
+\vspace*{-0.2cm}
+\end{block}
+
+
 \end{frame}
 
 
@@ -1703,13 +1713,13 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \includegraphics[scale=0.3]{figures/taxonomy.PNG}
 \end{center}
 \vspace*{-0.2cm}
-These approaches (\cite{wrapper2}) maximize an ``intermediary'' criteria, \textit{e.g.}\ \chi^2:
+These approaches (\cite{wrapper2}) maximize an ``intermediary'' criterion, \textit{e.g.}\ $\chi^2$:
 \vspace*{-0.1cm}
-\[ \hat{\q}_j = \argmax_{\q_j} \chi^2(\q_j(\mathbf{x}_\text{f}), \mathbf{y}_\text{f}), \]
+\[ \hat{\q}_j^{\chi^2} = \argmax_{\q_j} \chi^2(\q_j(\mathbf{x}_\text{f}), \mathbf{y}_\text{f}), \]
 \vspace*{-0.1cm}
-and {\bf hope} that it's aligned with your original goal:
+and we {\bf hope} that it's aligned with our original goal s.t.:
 \vspace*{-0.1cm}
-\[ \hat{\bm{\theta}}_{\hat{\q}} = \argmax_{\bm{\theta}_{\hat{\q}}} \ell(\bm{\theta}_{\hat{\q}} ; \mathcal{T}_\f). \]
+\[ \hat{\bm{\theta}}_{\hat{\q}^{\chi^2}} = \argmax_{\bm{\theta}_{\hat{\q}^{\chi^2}}} \ell(\bm{\theta}_{\hat{\q}^{\chi^2}} ; \mathcal{T}_\f) \stackrel{?}{\approx} \bm{\theta}^\star, \q^\star. \]
 
 \end{frame}
 
@@ -1842,7 +1852,7 @@ and {\bf hope} that it's aligned with your original goal:
 \frametitle{\secname: \subsecname}
 
 We wish to maximize the following likelihood:
-\[ (\hat{\bm{\theta}}, \hat{\bm{\alpha}}) = \argmax_{\bm{\theta}, \bm{\alpha}} \ell(\bm{\theta}, \bm{\alpha} ; \bm{x}, \bm{y}) = \argmax_{\bm{\theta}, \bm{\alpha}} \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i | \q_{\alpha}(\bm{x}_i)). \]
+\[ (\hat{\bm{\theta}}, \hat{\bm{\alpha}}) = \argmax_{\bm{\theta}, \bm{\alpha}} \ell(\bm{\theta}, \bm{\alpha} ; \bm{\mathbf{x}}_\f, \bm{\mathbf{y}}_\f) = \argmax_{\bm{\theta}, \bm{\alpha}} \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i | \q_{\alpha}(\bm{x}_i)). \]
 
 \medskip
 
@@ -1857,7 +1867,7 @@ We wish to maximize the following likelihood:
 \medskip
 
 \uncover<3->{
-{\bf Problem:} $\ell(\bm{\theta}, \bm{\alpha} ; \bm{x}, \bm{y})$ cannot be directly maximized (it's not even convex).
+{\bf Problem:} $\ell(\bm{\theta}, \bm{\alpha} ; \bm{\mathbf{x}}_\f, \bm{\mathbf{y}}_\f)$ cannot be directly maximized (it's not even convex).
 }
 
 \medskip
@@ -2680,7 +2690,7 @@ We suppose there is a true segmentation $K^\star, \mathbf{c}^\star$ and logistic
 
 \uncover<4->{
 If we could evaluate all segmentations, the best one could be selected by
-\[ (\hat{K}, \hat{\mathbf{c}}) = \argmax_{K,\mathbf{c}} \sum_{c=1}^K \text{BIC}((\bm{x}_i,y_i) | c_{i} = c};{\bm{\theta}^{c}),\]
+\[ (\hat{K}, \hat{\mathbf{c}}) = \argmax_{K,\mathbf{c}} \sum_{c=1}^K \text{BIC}((\bm{x}_i,y_i) | c_{i} = c;\bm{\theta}^{c}),\]
 where $\hat{\bm{\theta}}^c$ is the MLE of the logistic regression of segment $c$.
 }
 
