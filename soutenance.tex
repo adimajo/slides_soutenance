@@ -1690,8 +1690,9 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \begin{block}{Oracle}
 \vspace*{-0.4cm}
 \begin{align*}
-\bm{\theta}^\star, \q^\star = & \argmax_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \mathbb{E}_{\bm{x},y} \ln p_{\bm{\theta}}(y | \q(\bm{x})) \\
-\hat{\bm{\theta}}^{\text{BIC}}, \hat{\q}^{\text{BIC}} = & \argmin_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \text{BIC}(\bm{\theta}; \bm{\mathbf{y}}_{\text{f}}, \q(\bm{\mathbf{x}}_{\text{f}}))
+\bm{\theta}^\star, \q^\star = & \argmax_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \mathbb{E}_{\bm{x},y} \ln p_{\bm{\theta}}(y | \q(\bm{x})), \\
+\hat{\bm{\theta}}^{\text{BIC}}, \hat{\q}^{\text{BIC}} = & \argmin_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \text{BIC}(\hat{bm{\theta}}_{\q}; \bm{\mathbf{y}}_{\text{f}}, \q(\bm{\mathbf{x}}_{\text{f}})), \\
+\text{where } \hat{bm{\theta}}_{\q} = \argmax_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}} \ell(\bm{\theta} ; \bm{\mathbf{y}}_{\text{f}}, \q(\bm{\mathbf{x}}_{\text{f}})).
 \end{align*}
 \vspace*{-0.2cm}
 \end{block}
@@ -2014,7 +2015,7 @@ We wish to maximize the following likelihood:
 
 \begin{block}{New model selection criterion}
 We have drastically restricted the search space to \textit{iter} well-chosen candidates resulting from the the gradient descent steps.
-\[ (\q^\star,\bth^\star) = \argmin_{\textcolor{yellow}{\hat{\q} \in \{\hat{\q}^{(1)}, \ldots, \hat{\q}^{(\textit{iter})}\}},\bth \in \bm{\Theta}_{\textcolor{yellow}{\bm{m}}}} \text{BIC}(\hat{\bth}_{\hat{\q}}) \]
+\[ s^\star = \argmin_{s = 1, \ldots, \textit{iter}} \text{BIC}(\hat{\bth}_{\hat{\q}^{(s)}}) \]
 \end{block}
 
 \medskip
@@ -2228,62 +2229,62 @@ $10{,}000$ & $[0.666,0.666]$ & \myobar{0}{100}{0} & \mybar{88}{12}{0}
 
 
 
-\begin{frame}
-
-\frametitle{\secname: \subsecname}
-
-UCI data
-
-\medskip
-
-\begin{table}
-    \centering
-        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc} and two baselines: ALLR and MDLP / $\chi^2$ tests obtained on several benchmark datasets from the UCI library.}
-    \label{tab:banchmark}
-\begin{tabular}{llll}
-Dataset & ALLR & MDLP/$\chi^2$ & \textit{glmdisc} \\
-\hline
-Adult & 81.4 (1.0) & \textcolor{green}{85.3} (0.9) & 80.4 (1.0) \\
-Australian & 72.1 (10.4) & 84.1 (7.5) & \textcolor{green}{92.5} (4.5) \\
-Bands & 48.3 (17.8) & 47.3 (17.6) & \textcolor{green}{58.5} (12.0) \\
-Credit & 81.3 (9.6) & 88.7 (6.4) & \textcolor{green}{92.0} (4.7) \\
-German & 52.0 (11.3) & 54.6 (11.2) & \textcolor{green}{69.2} (9.1) \\
-Heart & 80.3 (12.1) & 78.7 (13.1) & \textcolor{green}{86.3} (10.6)
-\end{tabular}
-\end{table}
-
-
-\end{frame}
-
-
-
-\begin{frame}
-
-\frametitle{\secname: \subsecname}
-
-CACF data
-
-\medskip
-
-\begin{table}
-    \centering
-        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc}, the two baselines of Table~\ref{tab:banchmark} and the current scorecard (manual / expert representation) obtained on several portfolios of Cr\'edit Agricole Consumer Finance.}
-    \label{tab:real_data}
-\resizebox{.86\textwidth}{!}{\begin{tabular}{lllll}
-Portfolio & ALLR & Current & MDLP/$\chi^2$ & \textit{glmdisc} \\
-\hline
-Automobile & \textcolor{green}{59.3} (3.1) & 55.6 (3.4) & \textcolor{green}{59.3} (3.0) & 58.9 (2.6) \\
-Renovation & 52.3 (5.5) & 50.9 (5.6) & 54.0 (5.1) & \textcolor{green}{56.7} (4.8) \\
-Standard & 39.7 (3.3) & 37.1 (3.8) & \textcolor{green}{45.3} (3.1) & 44.0 (3.1) \\
-Revolving & 62.7 (2.8) & 58.5 (3.2) & \textcolor{green}{63.2} (2.8) & 62.3 (2.8) \\
-Mass retail & 52.8 (5.3) & 48.7 (6.0) & 61.4 (4.7) & \textcolor{green}{61.8} (4.6) \\
-Electronics & 52.9 (11.9) & 55.8 (10.8) & 56.3 (10.2)  & \textcolor{green}{72.6} (7.4)
-\end{tabular}}
-\end{table}
-
-%See \href{https://gist.github.com/adimajo/eb007492007d650091f6bd7cb2047493}{this gist} for $\chi^2$ automated grouping tests.
-
-\end{frame}
+%\begin{frame}
+%
+%\frametitle{\secname: \subsecname}
+%
+%UCI data
+%
+%\medskip
+%
+%\begin{table}
+%    \centering
+%        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc} and two baselines: ALLR and MDLP / $\chi^2$ tests obtained on several benchmark datasets from the UCI library.}
+%    \label{tab:banchmark}
+%\begin{tabular}{llll}
+%Dataset & ALLR & MDLP/$\chi^2$ & \textit{glmdisc} \\
+%\hline
+%Adult & 81.4 (1.0) & \textcolor{green}{85.3} (0.9) & 80.4 (1.0) \\
+%Australian & 72.1 (10.4) & 84.1 (7.5) & \textcolor{green}{92.5} (4.5) \\
+%Bands & 48.3 (17.8) & 47.3 (17.6) & \textcolor{green}{58.5} (12.0) \\
+%Credit & 81.3 (9.6) & 88.7 (6.4) & \textcolor{green}{92.0} (4.7) \\
+%German & 52.0 (11.3) & 54.6 (11.2) & \textcolor{green}{69.2} (9.1) \\
+%Heart & 80.3 (12.1) & 78.7 (13.1) & \textcolor{green}{86.3} (10.6)
+%\end{tabular}
+%\end{table}
+%
+%
+%\end{frame}
+%
+%
+%
+%\begin{frame}
+%
+%\frametitle{\secname: \subsecname}
+%
+%CACF data
+%
+%\medskip
+%
+%\begin{table}
+%    \centering
+%        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc}, the two baselines of Table~\ref{tab:banchmark} and the current scorecard (manual / expert representation) obtained on several portfolios of Cr\'edit Agricole Consumer Finance.}
+%    \label{tab:real_data}
+%\resizebox{.86\textwidth}{!}{\begin{tabular}{lllll}
+%Portfolio & ALLR & Current & MDLP/$\chi^2$ & \textit{glmdisc} \\
+%\hline
+%Automobile & \textcolor{green}{59.3} (3.1) & 55.6 (3.4) & \textcolor{green}{59.3} (3.0) & 58.9 (2.6) \\
+%Renovation & 52.3 (5.5) & 50.9 (5.6) & 54.0 (5.1) & \textcolor{green}{56.7} (4.8) \\
+%Standard & 39.7 (3.3) & 37.1 (3.8) & \textcolor{green}{45.3} (3.1) & 44.0 (3.1) \\
+%Revolving & 62.7 (2.8) & 58.5 (3.2) & \textcolor{green}{63.2} (2.8) & 62.3 (2.8) \\
+%Mass retail & 52.8 (5.3) & 48.7 (6.0) & 61.4 (4.7) & \textcolor{green}{61.8} (4.6) \\
+%Electronics & 52.9 (11.9) & 55.8 (10.8) & 56.3 (10.2)  & \textcolor{green}{72.6} (7.4)
+%\end{tabular}}
+%\end{table}
+%
+%%See \href{https://gist.github.com/adimajo/eb007492007d650091f6bd7cb2047493}{this gist} for $\chi^2$ automated grouping tests.
+%
+%\end{frame}
 
 
 
@@ -2449,7 +2450,7 @@ CACF data
     \centering
         \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc}, the two baselines and the current scorecard.}
     \label{tab:real_data_inter}
-\begin{tiny}
+\resizebox{\textwidth}{!}{
 \begin{tabular}{lllllll}
 Portfolio & ALLR & \makecell{Current\\performance} & \makecell{\textit{ad hoc}\\methods} & \makecell{Our proposal:\\ \textit{glmdisc}-NN} & \makecell{Our proposal:\\ \textit{glmdisc}-SEM} & \makecell{\textit{glmdisc}-SEM\\ w.\ interactions} \\
 \hline
@@ -2460,8 +2461,9 @@ Revolving & 62.7 (2.8) & 58.5 (3.2) & 63.2 (2.8) & 62.3 (2.8) & 60.7 (2.8) & \te
 Mass retail & 52.8 (5.3) & 48.7 (6.0) & 61.4 (4.7) & \textcolor{green}{\bf{61.8}} (4.6) & 61.0 (4.7) & 60.3 (4.8) \\
 Electronics & 52.9 (11.9) & 55.8 (10.8) & 56.3 (10.2)  & \textcolor{green}{\bf{72.6}} (7.4) & 62.0 (9.5) & 63.7 (9.0) \\
 \end{tabular}
-\end{tiny}
+}
 \end{table}
+
 
 \end{frame}
 
