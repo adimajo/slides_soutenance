@@ -2,8 +2,8 @@
 
 # Slides de ma soutenance de thèse
 
-Modèles prédictifs pour données volumineuses et biaisées  
-Application à l’amélioration du scoring en risque de crédit
+Formalisation et étude de problématiques de scoring en risque de crédit
+Inférence de rejet, discrétisation de variables et interactions, arbres de régression logistique
 
 Thèse de Doctorat en Mathématiques et leurs interactions de l'Université de Lille, Spécialité Statistique  
 Soutenue le ...  
@@ -21,14 +21,16 @@ J'utilise la fonction "Quick Build" de mon éditeur TeXmaker avec la commande su
 "pdflatex" -synctex=1 -interaction=nonstopmode %.tex|"biber" %|"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|"biber" %|"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|open %.pdf
 ```
 
+Avec le mode "presentation" de la classe beamer, le thème a un fond noir, mes notes sont produites sur une deuxième moitié de l'écran. Avec le mode "handout", le thème a un fond blanc (pour l'impression), les slides sont dans leur état final, i.e. sans transition, et mes notes n'apparaissent pas.
+
 Le fichier `soutenance.pdf` est ainsi obtenu dans le dossier `slides_soutenance`.
 
 **English version - French above**
 
 # My PhD defense
 
-Predictive models for big and biased data  
-Application to Credit Scoring
+Formalization and study of statistical problems in Credit Scoring
+Reject inference, discretization and pairwise interactions, logistic regression trees
 
 PhD of Applied Mathematics from the University of Lille, Speciality Statistics  
 Thesis defended on ...  
@@ -43,6 +45,8 @@ I use the "Quick Build" function of TeXmaker with the following command:
 ```bash
 "pdflatex" -synctex=1 -interaction=nonstopmode %.tex|"biber" %|"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|"biber" %|"pdflatex" -synctex=1 -interaction=nonstopmode %.tex|open %.pdf
 ```
+
+When the "presentation" option is set, the background is black and my notes show as a second screen on the right hand side of the screen. When the "handout" option is set, there is no transition, only the final "states" of each slide, which background is white and my notes are not displayed.
 
 The file `soutenance.pdf` should be visible in the `slides_soutenance` folder.
 
