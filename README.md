@@ -2,8 +2,8 @@
 
 # Slides de ma soutenance de thèse
 
-Formalisation et étude de problématiques de scoring en risque de crédit
-Inférence de rejet, discrétisation de variables et interactions, arbres de régression logistique
+Formalisation et étude de problématiques de scoring en risque de crédit  
+Inférence de rejet, discrétisation de variables et interactions, arbres de régression logistique  
 
 Thèse de Doctorat en Mathématiques et leurs interactions de l'Université de Lille, Spécialité Statistique  
 Soutenue le ...  
@@ -29,8 +29,8 @@ Le fichier `soutenance.pdf` est ainsi obtenu dans le dossier `slides_soutenance`
 
 # My PhD defense
 
-Formalization and study of statistical problems in Credit Scoring
-Reject inference, discretization and pairwise interactions, logistic regression trees
+Formalization and study of statistical problems in Credit Scoring  
+Reject inference, discretization and pairwise interactions, logistic regression trees  
 
 PhD of Applied Mathematics from the University of Lille, Speciality Statistics  
 Thesis defended on ...  
