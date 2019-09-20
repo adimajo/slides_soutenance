@@ -1,10 +1,29 @@
-\documentclass[english,xcolor={rgb,dvipsnames,table,usenames}]{beamer}
+\documentclass[english,xcolor={rgb,dvipsnames,table,usenames}, presentation]{beamer}
 
-\mode<presentation> {
+\mode<beamer> {
 
+\usepackage{pgfpages}
 \usecolortheme{magpie}
+\setbeamercolor{normal text}{fg=white}
+\usebeamercolor[fg]{normal text}
+\setbeameroption{show notes}
+\setbeameroption{show notes on second screen=right}
+\setbeamerfont{note page}{size=\footnotesize}
+
 
 }
+
+
+\mode<handout> {
+
+\usecolortheme{beaver}
+\setbeamercolor{normal text}{fg=black}
+\usebeamercolor[fg]{normal text}
+\renewcommand{\textcolor}[1]{}
+
+}
+
+
 
 \usepackage{colortbl}
 \usepackage{cancel}
@@ -42,6 +61,7 @@
 \usepackage[backend=biber,bibencoding=utf8]{biblatex}
 \usepackage{animate}
 \usepackage{listings}
+\usepackage{appendixnumberbeamer}
 \usetikzlibrary{calc}
 \usetikzlibrary{hobby}
 \makeatletter % from https://tex.stackexchange.com/a/283273/121799
@@ -261,8 +281,8 @@ yshift=-3ex,
   treenode/.style = {shape=rectangle, rounded corners,
                      draw, align=center,
                      top color=white, bottom color=blue!20},
-  root/.style     = {treenode, font=\Large, bottom color=red!30},
-  env/.style      = {treenode, font=\ttfamily\normalsize},
+  root/.style     = {treenode, font=\Huge, bottom color=red!30},
+  env/.style      = {treenode, font=\ttfamily\Large},
   dummy/.style    = {circle,draw,color=black}
 }
 
@@ -303,7 +323,7 @@ otherkeywords={install_github},             % Add keywords here
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title[Soutenance]{Formalisation et étude de problématiques \\ de scoring en risque de crédit \\ {\small Inférence de rejet, discrétisation de variables et interactions, \\ arbres de régression logistique}}
+\title[Soutenance]{Formalisation et étude de problématiques \\ de scoring en risque de crédit \\ {\vspace*{0.5cm} \small Inférence de rejet, discrétisation de variables et interactions, \\ arbres de régression logistique}}
 
 \author{Soutenance de thèse d'Adrien Ehrhardt \\ {\footnotesize
 Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
@@ -353,6 +373,22 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
                     }
                 }
 ]
+
+\newlength\mylinewidth
+\setlength\mylinewidth{0.4pt}
+
+\tikzset{
+    ultra thin/.style= {line width=0.25\mylinewidth},
+    very thin/.style=  {line width=0.5\mylinewidth},
+    thin/.style=       {line width=\mylinewidth},
+    semithick/.style=  {line width=1.5\mylinewidth},
+    thick/.style=      {line width=2\mylinewidth},
+    very thick/.style= {line width=3\mylinewidth},
+    ultra thick/.style={line width=4\mylinewidth},
+    every picture/.style={semithick}
+}
+
+
 
 
 \addtobeamertemplate{navigation symbols}{}{%
@@ -454,32 +490,109 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 
 \begin{document}
 
+
 \frame[plain]{\titlepage}
 
+\note{Merci aux rapporteurs pour le temps consacré à la lecture du manuscrit, aux membres du jury pour leur disponibilité pour cette soutenance de thèse intitulée... 
+
+\bigskip
+
+On reviendra sur ce qu'on entend par scoring dans ce qui suit
+
+\bigskip
+
+Thèse encadrée par... préparée au sein de... et, s'agissant d'une CIFRE, chez CACF}
+
+
+
+
+
 \begin{frame}
+
+%%%%%%%%%%%%%%%%
+\note{Je vais dans un premier temps introduire le contexte industriel et formalisation par l'introduction de notations. 
+
+\medskip
+
+Le premier apport de cette thèse, la Réintégration de refusés ou inférence de rejet.
+
+\medskip
+
+La sous-partie prépondérante de la thèse. Ce qu'on a mis dans le terme ``quantification'' à savoir la discrétisation de prédicteurs continus et le regroupement de modalités de variables catégorielles.
+
+\medskip
+
+Choix de passer sous silence les interactions.
+
+\medskip
+
+Dernière partie de thèse que l'on peut interpréter comme une segmentation prédictive : les arbres de régression logistique. Et quelques mots de conclusion.}
+%%%%%%%%%%%%%%%%
+
+
+
 \frametitle{Table of Contents}
 \tableofcontents[hideallsubsections]
 \end{frame}
 
+
+
 \section{Context and notations}
+
+\note{On se place dans la peau d'un chargé d'études statistiques qui a en face de lui un tel tableau.}
 
 \subsection{industrial setting}
 
-\begin{frame}
+\begin{frame}<handout:0>
 \frametitle{\secname: \subsecname}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+\note{Collecte des caractéristiques de demandeurs de crédit à la consommation.
+
+\medskip
+
+On connaît pour certains la performance de remboursement, c-à-d les clients financés.
+
+\medskip
+
+On cherche à estimer une probabilité de défaut de ces emprunteurs pour l'appliquer aux nouveaux demandeurs et décider de leur acceptation crédit.
+
+\medskip
+
+On passe traditionnellement par 6 étapes...
+
+\medskip
+
+On sélectionne les variables prédictives du remboursement.
+
+\medskip
+
+On effectue une régression logistique et une transformation qui donne le score.
+
+\medskip
+
+On se donne enfin un seuil en-dessous duquel les clients sont refusés.}
+%%%%%%%%%%%%%%%%%%%%
+
+
+
+
 \only<1-6>{
 \begin{table}
 \centering
 \begin{tiny}
 \hspace*{-0.7cm}\begin{tabular}{p{1.7cm}|p{1.1cm}|p{1cm}|p{1.4cm}|p{1.5cm}||p{0.6cm}|p{1cm}}
-\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<1-3>{Home} & \only<1-3>{Time in job} & \textcolor <4,6> {green} {\textbf<4,6>{Family status}} & \textcolor <4,5> {green} {\textbf<4,5>{Wages}} & \uncover<8->{\textcolor{green}{\textbf{Score}}} & Repayment \\
+\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<1-3>{Home} & \only<1-3>{Time in job} & \textcolor <4,6> {green} {\textbf<4,6>{Family status}} & \textcolor <4,5> {green} {\textbf<4,5>{Wages}} & \only<8->{\textcolor{green}{\textbf{Score}}} & Repayment \\
 \hline
-\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<1-3>{Owner} & \only<1-3>{20} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Widower}  \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4-5>{\only<1-4>{2000} \only<5->{]1500;2000]}}} & \uncover<8->{\textcolor{green}{\textbf{225}}} & 0  \\
-\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{?} \only<6->{?+Low-qualified}}} & \only<1-3>{Renter} & \only<1-3>{10} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Common-law}  \only<6>{Union}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{1700} \only<5->{]1500;2000]}}} & \uncover<8->{\textcolor{green}{\textbf{190}}} & 1  \\
-\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Licensed professional} \only<6->{High-qualified}}} & \only<1-3>{Starter} & \only<1-3>{5} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Divorced} \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{4000} \only<5->{]2000;$\infty$[}}} & \uncover<8->{\textcolor{green}{\textbf{218}}} & 0  \\
-\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Executive} \only<6->{High-qualified}}} & \only<1-3>{By work} & \only<1-3>{8} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Single} \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{2700} \only<5->{]2000;$\infty$[}}} & \uncover<8->{\textcolor{green}{\textbf{202}}} & 1  \\
-\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<8->{\textcolor{green}{\textbf{NA}}} & NA  \\
-\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<1-3>{Owner} & \only<1-3>{20} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Widower}  \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4-5>{\only<1-4>{2000} \only<5->{]1500;2000]}}} & \only<8->{\textcolor{green}{\textbf{225}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{?} \only<6->{?+Low-qualified}}} & \only<1-3>{Renter} & \only<1-3>{10} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Common-law}  \only<6>{Union}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{1700} \only<5->{]1500;2000]}}} & \only<8->{\textcolor{green}{\textbf{190}}} & 1  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Engineer} \only<6->{High-qualified}}} & \only<1-3>{Starter} & \only<1-3>{5} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Divorced} \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{4000} \only<5->{]2000;$\infty$[}}} & \only<8->{\textcolor{green}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Executive} \only<6->{High-qualified}}} & \only<1-3>{By work} & \only<1-3>{8} & \textcolor <4,6> {green} {\textbf<4,6>{\only<1-5>{Single} \only<6>{?+Alone}}} & \textcolor <4-5> {green} {\textbf<4>{\only<1-4>{2700} \only<5->{]2000;$\infty$[}}} & \only<8->{\textcolor{green}{\textbf{202}}} & 1  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \only<8->{\textcolor{green}{\textbf{NA}}} & NA  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \only<8->{{\textbf{NA}}} & NA  \\
 \end{tabular}
 \end{tiny}
 \caption{\label{tab:exemple} Dataset with outliers and missing values.} 
@@ -491,14 +604,14 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \centering
 \begin{tiny}
 \hspace*{-0.7cm}\begin{tabular}{p{2cm}|p{1.1cm}|p{1cm}|p{2.4cm}||p{0.6cm}|p{1cm}}
-\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {green} {\textbf<7>{Family status x Wages}} & \uncover<8->{\textcolor{green}{\textbf{Score}}} & Repayment \\
+\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {green} {\textbf<7>{Family status x Wages}} & \only<8->{\textcolor{green}{\textbf{Score}}} & Repayment \\
 \hline
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {green} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<8->{\textcolor{green}{\textbf{225}}} & 0  \\
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {green} {\textbf<7>{Union x ]1500;2000]}} & \uncover<8->{\textcolor{green}{\textbf{190}}} & 1  \\
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<8->{\textcolor{green}{\textbf{218}}} & 0  \\
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<8->{\textcolor{green}{\textbf{202}}} & 1  \\
-\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
-\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<8->{{\textbf{NA}}} & NA  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {green} {\textbf<6>{?+Alone x ]1500;2000]}} & \only<8->{\textcolor{green}{\textbf{225}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {green} {\textbf<7>{Union x ]1500;2000]}} & \only<8->{\textcolor{green}{\textbf{190}}} & 1  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Engineer} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<8->{\textcolor{green}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<8->{\textcolor{green}{\textbf{202}}} & 1  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \only<8->{{\textbf{NA}}} & NA  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \only<8->{{\textbf{NA}}} & NA  \\
 \end{tabular}
 \end{tiny}
 \caption{\label{tab:exemple} Dataset with outliers and missing values.}
@@ -515,7 +628,7 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {green} {\textbf<6>{?+Alone x ]1500;2000]}} & \only<9->{\textcolor{green}{\textbf{225}}} & 0  \\
 \textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {green} {\textbf<7>{Union x ]1500;2000]}} & \only<9->{\textcolor{green}{\textbf{190}}} & 1  \\
 \arrayrulecolor{green}\hline
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<9->{\textcolor{green}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Engineer} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<9->{\textcolor{green}{\textbf{218}}} & 0  \\
 \textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<9->{\textcolor{green}{\textbf{202}}} & 1  \\
 \textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \only<9->{{\textbf{NA}}} & NA  \\
 \textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \only<9->{{\textbf{NA}}} & NA  \\
@@ -530,15 +643,15 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \centering
 \begin{tiny}
 \hspace*{-0.7cm}\begin{tabular}{p{2cm}|p{1.1cm}|p{1cm}|p{2.4cm}||p{0.6cm}|p{1cm}}
-\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {green} {\textbf<7>{Family status x Wages}} & \uncover<9->{\textcolor{green}{\textbf{Score}}} & Repayment \\
+\textcolor <4,6> {green} {\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} & \textcolor <7> {green} {\textbf<7>{Family status x Wages}} & \only<9->{\textcolor{green}{\textbf{Score}}} & Repayment \\
 \hline
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {green} {\textbf<6>{?+Alone x ]1500;2000]}} & \uncover<9->{\textcolor{green}{\textbf{225}}} & 0  \\
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {green} {\textbf<7>{Union x ]1500;2000]}} & \uncover<9->{\textcolor{green}{\textbf{190}}} & 1  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} & \textcolor <7> {green} {\textbf<6>{?+Alone x ]1500;2000]}} & \only<9->{\textcolor{green}{\textbf{225}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} & \textcolor <7> {green} {\textbf<7>{Union x ]1500;2000]}} & \only<9->{\textcolor{green}{\textbf{190}}} & 1  \\
 \hline
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Licensed professional} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{green}{\textbf{218}}} & 0  \\
-\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \uncover<9->{\textcolor{green}{\textbf{202}}} & 1  \\
-\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
-\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \uncover<9->{{\textbf{NA}}} & NA  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Engineer} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<9->{\textcolor{green}{\textbf{218}}} & 0  \\
+\textcolor <4,6> {green} {\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} & \textcolor <7> {green} {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<9->{\textcolor{green}{\textbf{202}}} & 1  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} &  \textcolor <3> {green} {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \only<9->{{\textbf{NA}}} & NA  \\
+\textcolor <3> {green} {\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & \textcolor <3> {green} {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} \textcolor <3> {green} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \only<9->{{\textbf{NA}}} & NA  \\
 \end{tabular}
 \end{tiny}
 \caption{\label{tab:exemple} Dataset with outliers and missing values.}
@@ -559,10 +672,64 @@ Encadré par Christophe Biernacki, Philippe Heinrich, Vincent Vandewalle
 \end{frame}
 
 
+
+
+
+\begin{frame}<beamer:0>[noframenumbering]
+\frametitle{\secname: \subsecname}
+
+\begin{table}
+\centering
+\begin{tiny}
+\hspace*{-0.7cm}\begin{tabular}{p{2cm}|p{1.1cm}|p{1cm}|p{2.4cm}||p{0.6cm}|p{1cm}}
+{\textbf<4,6>{Job}} & \only<2-3>{Home} & \only<2-3>{Time in job} &  {\textbf<7>{Family status x Wages}} & \only<9->{\textcolor{black}{\textbf{Score}}} & Repayment \\
+\hline
+{\textbf<4,6>{\only<2-5>{Craftsman} \only<6->{?+Low-qualified}}} & \only<2-3>{Owner} & \only<2-3>{20} &  {\textbf<6>{?+Alone x ]1500;2000]}} & \only<9->{\textcolor{black}{\textbf{225}}} & 0  \\
+{\textbf<4,6>{\only<2-5>{?} \only<6->{?+Low-qualified}}} & \only<2-3>{Renter} & \only<2-3>{10} &  {\textbf<7>{Union x ]1500;2000]}} & \only<9->{\textcolor{black}{\textbf{190}}} & 1  \\
+\hline
+{\textbf<4,6>{\only<2-5>{Engineer} \only<6->{High-qualified}}} & \only<2-3>{Starter} & \only<2-3>{5} &  {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<9->{\textcolor{black}{\textbf{218}}} & 0  \\
+{\textbf<4,6>{\only<2-5>{Executive} \only<6->{High-qualified}}} & \only<2-3>{By work} & \only<2-3>{8} &  {\textbf<7>{?+Alone x ]2000;$\infty$[}} & \only<9->{\textcolor{black}{\textbf{202}}} & 1  \\
+{\textbf<3>{\only<1-2>{{Office employee}} \only<3->{\cancel{Office employee}}}} & {\textbf<3>{\only<1-2>{Renter} \only<3->{\cancel{Renter}}}} & {\textbf<3>{\only<1-2>{12} \only<3->{\cancel{12}}}} & {\textbf<3>{\only<1-2>{Married} \only<3->{\cancel{Married}}}} {\textbf<3>{\only<1-2>{1400} \only<3->{\cancel{1400}}}} & \only<9->{{\textbf{NA}}} & NA  \\
+{\textbf<3>{\only<1-2>{Worker} \only<3->{\cancel{Worker}}}} & {\textbf<3>{\only<1-2>{By family} \only<3->{\cancel{By family}}}} & {\textbf<3>{\only<1-2>{2} \only<3->{\cancel{2}}}} & {\textbf<3>{\only<1-2>{?} \only<3->{\cancel{?}}}} {\textbf<3>{\only<1-2>{1200} \only<3->{\cancel{1200}}}} & \only<9->{{\textbf{NA}}} & NA  \\
+\end{tabular}
+\end{tiny}
+\caption{\label{tab:exemple} Dataset with outliers and missing values.}
+\end{table}
+
+
+\begin{enumerate}
+\item \textbf<3>{Discarding rejected applicants}
+\item {\textbf<4>{Feature selection}}
+\item {\textbf<5>{Discretization}} / {\textbf<6>{grouping}}
+\item {\textbf<7>{Interaction screening}}
+\item {\textbf<8>{Segmentation}}
+\item {\textbf<9>{Logistic regression fitting}}
+\end{enumerate}
+
+
+\end{frame}
+
+
+
 \subsection{available data}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\note{Une fois le décors industriel planté, on cherche à le formaliser, un aller-retour que je ferai souvent au cours de la présentation.
+
+\bigskip
+
+Variables aléatoires, vecteur x noté en gras ; observations ; un prédicteur $x_j$ peut être continu ou catégoriel à $l_j$ modalités.
+
+\bigskip
+
+Ensembles : clients financés (dont les prédicteurs sont notés x droit), non financés pour lesquels la performance de remboursement est absente, échantillon d'observation, échantillon complété (inaccessible).}
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 Random variables: $\bm{X}, Y, Z$.
 
@@ -580,12 +747,6 @@ z & \in \{\f,\nf\} \quad && \text{financed or not financed.}
 \vspace*{-0.6cm}
 \end{block}
 }
-
-%\bigskip
-%
-%\uncover<3->{
-%True distribution of good and bad clients: $p(y | \bm{x})$.
-%}
 
 \bigskip
 
@@ -610,8 +771,30 @@ z & \in \{\f,\nf\} \quad && \text{financed or not financed.}
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
+%%%%%%%%%%%%%%%%
+\note{Schématiquement, l'échantillon observé se compose d'une partie financée en vert, et non financée en orange où on voit bien que la performance de remboursement des clients non financés est inconnue.
+
+\medskip
+
+On aimerait estimer la loi de remboursement des crédits en fonction des covariables, autrement dit prédire y en fonction de x.
+
+\medskip
+
+Traditionnellement en Credit Scoring pour que ce modèle soit interprétable, c-à-d qu'on puisse expliquer la décision à partir des prédicteurs, on repose sur des modèles paramétriques simples comme la régression logistique qui s'écrit ainsi...
+
+\medskip
+
+Le log-odd ratio de l'évènement s'écrit comme une combinaison linéaire des prédicteurs.
+
+\medskip
+
+Il faut à présent logiquement estimer ce coefficient, et a priori on imagine que l'absence d'étiquette pour les clients financés va impacter le processus d'estimation.}
+%%%%%%%%%%%%%%%%
+
+
 The observed data are the following:
 
+{
 \setbeamercolor{normal text}{fg=black}
 \usebeamercolor[fg]{normal text}
 
@@ -668,268 +851,24 @@ y_n \tikzmarkend{e4} \\
 \\
 \textcolor{white}{\bigg).} \end{array}
 \]
-
-\setbeamercolor{normal text}{fg=white}
-\usebeamercolor[fg]{normal text}
+}
 
 \medskip
 
 \uncover<2->{
-%Need for a {\bf computable model} that resembles $p$, often in the form of a {\bf parametric} model $p_{\bm{\theta}}(y | \bm{x})$, which we can calculate for a new client.
 \textit{Credit Scoring} aims at estimating $p(y | \bm{x})$ in the form of a simple {\bf parametric} model $p_{\bm{\theta}}(y | \bm{x})$ such as logistic regression:
 }
 
 \medskip
 
 \uncover<3->{
-%Example: logistic regression 
 \[ \ln \frac{p_{\bm{\theta}}(1 | \bm{x})}{1 - p_{\bm{\theta}}(1 | \bm{x})} = (1,\bm{x})' \bm{\theta}. \]
 }
-
-%\medskip
-%
-%\uncover<3->{
-%There is $\bm{\theta}^\star$ that makes $p_{\bm{\theta}^\star}$ ``close'' to $p$.
-%
-%$\bm{\theta}^\star = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}})] = \int_{\mathcal{X}} \sum_{y \in \{0,1\}} p(y | \bm{x}) \ln \dfrac{p(y | \bm{x})}{p_{\bm{\theta}}(y | \bm{x})}$.
-%
-%\begin{block}{Well-specified model assumption}
-%$\mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}^\star})] = 0,$
-%
-%$p_{\bm{\theta}^\star}(y | \bm{x}) = p(y | \bm{x}).$
-%\end{block}
-%}
 
 \end{frame}
 
 
-%\subsection{Estimation}
-%\begin{frame}
-%\frametitle{\secname: \subsecname}
-%
-%\end{frame}
 
-
-
-
-%\begin{frame}
-%\frametitle{\secname: \subsecname}
-%
-%\begin{figure}
-%\begin{center}
-%\resizebox{0.8\textwidth}{4.7cm}{
-%\begin{tikzpicture}[scale=1.1,every node/.style={minimum size=1cm},on grid]
-%
-%	% Real level
-%	\begin{scope}[
-%		yshift=-120,
-%		every node/.append style={yslant=\yslant,xslant=\xslant},
-%		yslant=\yslant,xslant=\xslant
-%	] 
-%		% The frame:
-%		\draw[white, dashed, thin] (0,0) rectangle (7,7); 
-%		% Agents:
-%		\draw[fill=red]  
-%			%(5,2) circle (.1) % Firms
-%			(2,2) circle (.1); % Households
-%		% Flows:
-%		%\draw[-latex,thin, blue] 
-%			%(2,2.2) to (2,4); % Labour Powers
-%		%\draw[-latex,thin, blue]
-%			%(4.85,1.85) to (4,1); % Wages
-%		 % Labels:
-%		\fill[white]
-%			(0.5,6.5) node[right, scale=2.5] {Space $\Theta$}	
-%			(2.1,1.9) node[below,scale=2]{$\bm{\theta}^\star$};
-%
-%	\end{scope}
-%	
-%	% 2 vertical lines for linking agents on the 2 levels
-%	%\draw[thin, dashed, red](.8,1.75) to (3.8,-0.32);
-%	\draw[thin, dashed, red](.8,1.75) to (.8,-1.8);
-%	
-%    % Draw right angle scheme
-%    \draw(.8,-1.6) to (1,-1.6);
-%    \draw(1,-1.6) to (1,-1.8);
-%
-%
-%	% Monetary level
-%	\begin{scope}[
-%		yshift=-20,
-%		every node/.append style={yslant=0,xslant=0},
-%		yslant=\yslant,xslant=\xslant
-%	]
-%		 % Agents:
-%		\draw [fill=olive]
-%			(2,2) circle (.1); % Households
-%		 % Labels:
-%		\fill[black]
-%			(2.2,2.4) node[right,scale=2]{\textcolor{olive}{$p(y|x)$}};
-%        \fill[red]
-%			(0.85,0.35) node [right, scale=1.5] {Model bias};	
-%
-%	\end{scope} 
-%\end{tikzpicture}
-%}
-%\end{center}
-%%\caption{\label{fig:projection} Vision géométrique du biais de modèle.}
-%\end{figure}
-%
-%
-%\end{frame}
-
-
-
-
-
-
-%\begin{frame}
-%\frametitle{\secname: \subsecname}
-%
-%$p$ is unknown: access to an i.i.d.\ $n+n'$-sample $\mathcal{T} = (\bm{x}_i, y_i, z_i)_1^{n+n'} \sim p$.
-%
-%\medskip
-%
-%\uncover<2->{
-%We can deduce from the KL divergence the (log-)likelihood:
-%\[ \ell(\bm{\theta} ; \mathcal{T}) = \sum_{i=1}^{n+n'} \ln p_{\bm{\theta}}(y_i | \bm{x}_i). \]
-%}
-%
-%\medskip
-%
-%\uncover<3->{
-%The MLE $\hat{\bm{\theta}} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathcal{T})$ is a good approximation of $\bm{\theta}^\star$.
-%}
-%
-%\medskip
-%
-%\uncover<4->{
-%Unfortunately, $\hat{\bm{\theta}}$ is not directly computable (no closed form solution).
-%}
-%
-%\medskip
-%
-%\uncover<5->{
-%\[ \tilde{\bm{\theta}} = \text{Newton-Raphson}(\ell(\bm{\theta} ; \mathcal{T})) \neq \hat{\bm{\theta}}. \]
-%}
-%
-%\end{frame}
-%
-%
-%\begin{frame}
-%\frametitle{\secname: \subsecname}
-%
-%
-%\begin{figure}
-%\begin{center}
-%\resizebox{0.8\textwidth}{4.7cm}{
-%\begin{tikzpicture}[scale=1.1,every node/.style={minimum size=1cm},on grid]
-%
-%	% Real level
-%	\begin{scope}[
-%		yshift=-120,
-%		every node/.append style={yslant=\yslant,xslant=\xslant},
-%		yslant=\yslant,xslant=\xslant
-%	] 
-%		% The frame:
-%		\draw[white, dashed, thin] (-0.5,-0.5) rectangle (6.5,6.5); 
-%		% Agents:
-%		\draw[fill=red]  
-%			%(5,2) circle (.1) % Firms
-%			(2,2) circle (.1); % Households
-%		% Flows:
-%		\draw[-latex,thin, blue] 
-%			(2,2.2) to (2,4); % Labour Powers
-%		\draw[-latex,thin, orange]
-%			(2,4) to (1,5); % Wages
-%		 % Labels:
-%		\fill[white]
-%			(0.2,6) node[right, scale=2.5] {Space $\Theta$}
-%			(2.1,1.9) node[below,scale=2]{$\bm{\theta}^\star$}
-%			(2.2,4.3) node [scale=2] {$\hat{\bm{\theta}}$} ;
-%		\fill[blue]
-%			(0.7,3) node [scale=1] {Bias and variance}
-%            (0.5,2.7) node [scale=1] {of estimation};
-%         \fill[orange]
-%			(0.5,4.2) node [scale=1] {Comp.}
-%			(0.5,3.8) node [scale=1] {precision};
-%
-%		%\fill[blue]
-%			%(5.7,1.1) node [scale=1] {Estimation}
-%           % (5.7,0.8) node [scale=1] {bias+variance};
-%
-%	\end{scope}
-%	
-%	% 2 vertical lines for linking agents on the 2 levels
-%	%\draw[thin, dashed, red](.8,1.75) to (3.8,-0.32);
-%	\draw[thin, dashed, red](.8,1.75) to (.8,-1.8);
-%	
-%    % Draw right angle scheme
-%    \draw(.8,-1.6) to (1,-1.6);
-%    \draw(1,-1.6) to (1,-1.8);
-%
-%
-%	% Monetary level
-%	\begin{scope}[
-%		yshift=-20,
-%		every node/.append style={yslant=0,xslant=0},
-%		yslant=\yslant,xslant=\xslant
-%	]
-%		 % Agents:
-%		\draw [fill=olive]
-%			(2,2) circle (.1); % Households
-%		 % Labels:
-%		\fill[black]
-%			(2.2,2.1) node[right,scale=2]{\textcolor{olive}{$p(y|x)$}};
-%        \fill[red]
-%			(0.85,0.35) node [right, scale=1.5] {Model bias};	
-%
-%	\end{scope} 
-%\end{tikzpicture}
-%}
-%\end{center}
-%%\caption{\label{fig:projection2} Vision géométrique du biais de modèle, biais et variance d'estimation.}
-%\end{figure}
-%
-%All of this is ``hidden'' in your favourite statistical language / package / library but is essential to understanding Reject Inference.
-%
-%\end{frame}
-%
-%
-%
-%
-%
-%
-%\subsection{Feature / model selection}
-%
-%\begin{frame}
-%\frametitle{\secname: \subsecname}
-%
-%Up to now, we assumed a parameter space $\Theta$ {\bf fixed}.
-%
-%\medskip
-%
-%\uncover<2->{
-%Comparing models = different parameter spaces $\Theta^1, \Theta^2, \dots$ 
-%
-%Corresponding to feature subsets, different discretizations, interactions, \dots since {\bf we don't know which parameter space is closest to the ``truth''} $p$.
-%}
-%
-%\medskip
-%
-%\uncover<3->{
-%\begin{block}{Model selection tools}
-%\[ \hat{\bm{\theta}}^{\text{best}} = \argmin_{\hat{\bm{\theta}}^k \in \Theta^k} \text{BIC}(\hat{\bm{\theta}}^k) = - 2\ell(\hat{\bm{\theta}}^k, \mathcal{T}) + \text{dim}(\Theta^k) \ln n .\]
-%\end{block}
-%}
-%
-%\medskip
-%
-%\uncover<4->{
-%BIC has nice statistical properties (consistency) but can be swapped in the entire presentation with your favourite model selection tool like Gini on $\mathcal{T}^{\text{test}}$.
-%}
-%
-%\end{frame}
 
 
 
@@ -937,10 +876,25 @@ y_n \tikzmarkend{e4} \\
 
 \section{Reject Inference}
 
+\note{On parle alors de réintégration des refusés ou d'inférence de rejet.}
+
+
 \subsection{industrial setting}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
+
+
+
+%%%%%%%%%%%%%
+\note{Le mécanisme de financement, et donc de génération des données, d'un point de vue industriel, est complexe : il dépend d'un score précédent, qui peut lui-même dépendre des covariables $x$ mais éventuellement d'autres, de règles expertes, et de règles manuelles, dépendantes des opérateurs...
+
+\bigskip
+
+De sorte que, sur l'ensemble des demandes de crédit d'une année, environ 43 pourcents sont financés seulement}
+%%%%%%%%%%%%%
+
+
 
 \begin{figure}[ht]
 \begin{minipage}[c]{0.45\linewidth}
@@ -960,11 +914,36 @@ y_n \tikzmarkend{e4} \\
 \end{frame}
 
 
+
+
+
+
+
+
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
-We traditionally build a logistic regression using only financed clients ({\bf fixed parameter space $\Theta$}):
+%%%%%%%%%%%%%%%%%%%%
+\note{Si on revient à la formalisation statistique, on a une contrainte de modélisation par régression logistique, qu'on interprète ici comme un espace des paramètres grand $\theta$ fixe, et une pratique ``métier'' consistant à n'utiliser que les clients financés dans l'estimation de $\theta$ qu'on note $\hat{\bm{\theta}}_{\f}$.
+
+\bigskip
+
+A ce stade, implicitement, le chargé d'études statistiques approche un paramètre asymptotique symbolisé par l'étoile, minimisant une divergence de Kullback-Leibler entre la vraie loi et la loi logistique conditionnellement à Z=f, c-à-d au fait d'être financé.}
+%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+The industry traditionally fits a logistic regression using only financed clients ({\bf fixed parameter space $\Theta$}):
+
+\begin{minipage}[c]{0.1\linewidth}
+\begin{animateinline}[autoplay,loop]{2}%
+{\color{orange}{\bf CACF}}%
+\newframe \end{animateinline}
+\end{minipage}
+\begin{minipage}[c]{0.85\linewidth}
 \[ \hat{\bm{\theta}}_{\f} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathcal{T}_\f) = \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i | \bm{x}_i), \]
+\end{minipage}
 which asymptotically approximates:
 \[ \bm{\theta}_{\f}^\star = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}}) | Z = \f]. \]
 
@@ -972,16 +951,31 @@ which asymptotically approximates:
 
 
 
+
+
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
-We wish we had:
-\[ \hat{\bm{\theta}} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathcal{T}_{\text{c}}), \]
-which asymptotically approximates:
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\note{Ce qu'on aimerait avoir plutôt, c'est le paramètre $\bm{\theta}^\star$ qui n'est pas conditionnel au fait d'être financé et qui pourrait être très simplement obtenu comme une quantité asymptotique du paramètre de maximum de vraisemblance $\hat{\bm{\theta}}$ irrémédiablement inaccessible puisqu'on ne connaît pas toutes les étiquettes.
+
+D'un point de vue géométrique, on peut représenter l'espace des modèles de regression logistique de coefficient $\theta$, la vraie loi qui n'est pas forcément dans cet espace, le paramètre $\bm{\theta}^\star$ qui est la projection orthogonale de cette loi sur l'espace du modèle et le paramètre conditionnel au financement qui se promène dans cet espace et dont le biais est potentiellement plus grand que $\bm{\theta}^\star$.
+
+C'est là tout l'enjeu d'une formalisation rigoureuse : montrer sous quelles hypothèses ce biais existe et si ces hypothèses sont réalistes.
+
+Notons aussi que même à supposer que les paramètres asymptotiques sont égaux, la variance du paramètre conditionnel au fait d'être financé sera plus grande puisqu'on a moins d'observations.}
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+Oracle to be approximated:
 \begin{align*}
 \bm{\theta}^\star & = \argmin_{\bm{\theta}} \mathbb{E}_{\bm{X}} [\text{KL}(p || p_{\bm{\theta}})] \\
 & = \argmax_{\bm{\theta}} \mathbb{E}_{\bm{x}, y \sim p} [\ln p_{\bm{\theta}}(y | \bm{x})].
 \end{align*}
+which standard estimator would be:
+\[ \hat{\bm{\theta}} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathcal{T}_{\text{c}}), \]
 But we lack $\mathbf{y}_{\nf}$.
 \vspace*{-0.8cm}
 \begin{center}
@@ -1061,12 +1055,18 @@ But we lack $\mathbf{y}_{\nf}$.
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
+
+
+%%%%%%%%%%%%%%
+\note{}
+%%%%%%%%%%%%%%
+
 Due to the financing mechanism, labels $y$ are not MCAR.
 
 \medskip
 
 \uncover<2->{
-Suppose there is some hidden financing mechanism belonging to a parametrized family $\{p_{\bm{\phi}}(z | \bm{x}, y)\}_{\bm{\phi} \in \bm{\Phi}}$.
+Let $\{p_{\bm{\phi}}(z | \bm{x}, y)\}_{\bm{\phi} \in \bm{\Phi}}$ denote this hidden financing mechanism (as a parametrized family).
 }
 
 \medskip
@@ -1079,10 +1079,32 @@ Combining financing and credit-worthiness probability distributions:
 %\medskip
 
 \uncover<4->{
-To estimate $\bm{\gamma}$, we could rely on Maximum Likelihood theory and maximize:
-\[ \ell(\bm{\gamma}; \mathcal{T}) = \sum_{i = 1}^n \ln p_{\bm{\gamma}}(y_i,\f | \bm{x}_i) + \sum_{i=n'}^{n+n'} \ln \sum_{y \in \{0,1\}} p_{\bm{\gamma}}(y,\nf | \bm{x}_i), \]
-\textit{e.g.}\ \textit{via} an EM algorithm.
+To estimate $\bm{\gamma}$, we could rely on Maximum Likelihood theory.
 }
+
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{\secname : \subsecname}
+
+
+
+%%%%%%%%%%%%%%
+\note{}
+%%%%%%%%%%%%%%
+
+\begin{minipage}[c]{0.15\linewidth}
+\begin{animateinline}[autoplay,loop]{2}%
+{\color{orange}{\bf Statistician}}%
+\newframe \end{animateinline}
+\end{minipage}%
+\begin{minipage}[c]{0.80\linewidth}
+\[ \vspace*{-0.8cm} \hspace*{0.7cm} \ell(\bm{\gamma}; \mathcal{T}) = \sum_{i = 1}^n \ln p_{\bm{\gamma}}(y_i,\f | \bm{x}_i) + \sum_{i=n+1}^{n+n'} \ln \sum_{y \in \{0,1\}} p_{\bm{\gamma}}(y,\nf | \bm{x}_i), \]
+\end{minipage}
+\textit{e.g.}\ \textit{via} an EM algorithm:
+
 
 \end{frame}
 
@@ -1091,10 +1113,17 @@ To estimate $\bm{\gamma}$, we could rely on Maximum Likelihood theory and maximi
 
 
 
-\subsection*{missingness mechanism}
+\subsection{missingness mechanism}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
+
+
+%%%%%%%%%%%%%%%
+\note{}
+%%%%%%%%%%%%%%%
+
+
 
 \begin{itemize}
 \item \textbf{Ignorability}: no functional dependence between $\bm{\theta}$ and $\bm{\phi}$, \textit{e.g.}\ $\bm{\gamma} = (\bm{\theta},\bm{\phi})$.
@@ -1138,10 +1167,19 @@ edges
 
 
 
+
 \subsection{flawed model selection}
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
+
+
+
+%%%%%%%%%%%
+\note{}
+%%%%%%%%%%%
+
+
 
 Because no test-sample $\mathcal{T}^{\text{test}}$ is available from $p(\bm{x}, y, z)$, we cannot resort to error-rate criteria.
 
@@ -1168,12 +1206,22 @@ It requires to precisely state the models $\{ p_{\bm{\gamma}}(y,z | \bm{x})\}_{\
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
+
+
+%%%%%%%%%%%%%%%%
+\note{}
+%%%%%%%%%%%%%%%%
+
+
+
+
 We gathered 6 so-called Reject Inference methods from the literature~\cite{economix,saporta,RI6,banasik} that aim at re-injecting $\bm{\mathbf{x}}_{\nf}$ into the estimation procedure of $\bm{\theta}$.
 
 \medskip
 
 They usually resemble EM-like algorithms:
 
+{
 \setbeamercolor{normal text}{fg=black}
 \usebeamercolor[fg]{normal text}
 
@@ -1219,9 +1267,10 @@ They usually resemble EM-like algorithms:
 \text{nf} \\
 \vdots \\
 \text{nf} \tikzmarkend{e41} \end{array} \textcolor{white}{{\Huge \Bigg) \Bigg)}}\]
+ }
  
-\setbeamercolor{normal text}{fg=white}
-\usebeamercolor[fg]{normal text}
+%\setbeamercolor{normal text}{fg=white}
+%\usebeamercolor[fg]{normal text}
 
 \end{frame}
 
@@ -1231,6 +1280,14 @@ They usually resemble EM-like algorithms:
 
 \begin{frame}
 \frametitle{\secname : \subsecname}
+
+
+%%%%%%%%%%%%%%%%
+\note{}
+%%%%%%%%%%%%%%%%
+
+
+
 
 Fuzzy augmentation and Twins produce the same coefficient $\hat{\bm{\theta}}_{\text{f}}$.
 
@@ -1260,306 +1317,45 @@ Reclassification is equivalent to a Classification-EM algorithm, thus introducin
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-\begin{figure}[!ht]
-\centering \resizebox{.8\textwidth}{!}{\input{CODE_FIGURES/electronics.tex}}
-\caption{Electronics loans dataset from CACF.}
-\label{fig:darty_reject}
-\end{figure}
+
+
+%%%%%%%%%%%%%%%%
+\note{On retourne au cadre CACF où on teste ces trois méthodes sur deux jeux de données : un portefeuille d'un partenaire de grande distribution et un portefeuille compte propre, c-à-d Sofinco
+
+\bigskip
+
+Dans les deux cas, on simule artificiellement un mécanisme de rejet en augmentant progressivement le cut de l'ancien score, jusqu'au point où il n'y a plus suffisamment de mauvais payeur pour apprendre.
+
+\bigskip
+
+On a ainsi une sorte d'ensemble test de $p(x,y,z)$.
+
+\bigskip
+
+On remarque que les trois méthodes ne sont pas significativement différentes en termes de Gini.
+
+\bigskip
+
+Notre conseil à CACF est donc de ne pas pratiquer de réintégration dans le cas de la régression logistique.
+}
+%%%%%%%%%%%%%%%%
+
+
+
 \vspace*{-1cm}
 \begin{figure}[!ht]
-\centering \resizebox{.8\textwidth}{!}{\input{CODE_FIGURES/standard.tex}}
-\caption{Standard loans dataset from CACF.}
-\label{fig:M3_reject}
+\centering \resizebox{\textwidth}{!}{\input{CODE_FIGURES/electronics.tex}}
+%\caption{Electronics loans dataset from CACF.}
+%\label{fig:darty_reject}
+\end{figure}
+\vspace*{-1.5cm}
+\begin{figure}[!ht]
+\centering \resizebox{\textwidth}{!}{\input{CODE_FIGURES/standard.tex}}
+%\caption{Standard loans dataset from CACF.}
+%\label{fig:M3_reject}
 \end{figure}
 
 \end{frame}
-
-
-
-
-
-%\subsection{What is at stake?}
-%
-%\begin{frame}
-%\frametitle{\secname : \subsecname}
-%\textbf{Estimators :}
-%
-%\hspace*{-0.2cm}\begin{alignat*}{6}
-%& \text{``Oracle'':} & \sqrt[]{n+n'} && ( \hat{\bm{\theta}} - \bm{\theta}^\star ) &&& \xrightarrow[n,n' \to \infty]{\mathcal{L}} &&& \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star}) \\
-%& \text{Current methodology:} & \sqrt[]{n} && ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) &&& \xrightarrow[n \to \infty]{\mathcal{L}} &&& \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})
-%\end{alignat*}
-
-%\begin{enumerate}
-%\only<1>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
-%\only<2>{\item ‘‘Oracle'': $\textcolor{red}{\sqrt[]{n+n'}} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
-%\only<3>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \textcolor{red}{\bm{\theta}^\star} ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\bm{\theta}^\star})$}
-%\only<4>{\item ‘‘Oracle'': $\sqrt[]{n+n'} ( \hat{\bm{\theta}} - \bm{\theta}^\star ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\bm{\theta}^\star}})$}
-%\only<5->{\item ‘‘Oracle'': $\textcolor{red}{\sqrt[]{n+n'}} ( \hat{\bm{\theta}} - \textcolor{red}{\bm{\theta}^\star} ) \xrightarrow[n,n' \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\bm{\theta}^\star}})$}
-%
-%\only<1>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
-%\only<2>{\item Current methodology: $ \textcolor{red}{\sqrt[]{n}} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
-%\only<3>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \textcolor{red}{\bm{\theta}^\star_{\f}} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,{\Sigma}_{\f,\bm{\theta}^\star_{\f}})$}
-%\only<4>{\item Current methodology: $ \sqrt[]{n} ( \hat{\bm{\theta}}_{\f} - \bm{\theta}^\star_{\f} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\f,\bm{\theta}^\star_{\f}}})$}
-%\only<5->{\item Current methodology: $ \textcolor{red}{\sqrt[]{n}} ( \hat{\bm{\theta}}_{\f} - \textcolor{red}{\bm{\theta}^\star_{\f}} ) \xrightarrow[n \to \infty]{\mathcal{L}} \mathcal{N}_{d+1} (0,\textcolor{red}{{\Sigma}_{\f,\bm{\theta}^\star_{\f}}})$}
-%
-%\end{enumerate}
-
-%\bigskip
-%
-%\bigskip
-%
-%\uncover<5->{
-%\textbf{\textcolor{red}{Question 1} :} asymptotics of the estimators
-%
-%{\centering{\fbox{(Q1) $ {\bm{\theta}}^\star \stackrel{?}{=} {{\bm{\theta}}}^\star_{\f} $}}}
-%
-%%\fbox{(Q2) \centering{${\Sigma}_{\bm{\theta}^\star} \stackrel{?}{=} {\Sigma}_{\f,\bm{\theta}^\star_{\f}} $}}
-%
-%}
-%
-%\uncover<6->{
-%\textbf{\textcolor{red}{Question 2} :} bla
-%}
-%
-%\end{frame}
-
-%----------------------------------------------------------------------------------------
-
-
-
-%----------------------------------------------------------------------------------------
-
-%\subsection*{Model specification}
-%
-%\begin{frame}
-%\frametitle{\secname : \subsecname}
-%
-%\begin{itemize}
-%\item \textbf{Well-specified model} : $p(y|\bm{x}) = p_{\bm{\theta}^\star}(y|\bm{x})$.
-%
-%$\rightarrow$ With real data $\Rightarrow$ hypothesis unlikely to be true.
-%\item \textbf{Misspecified model} : $\bm{\theta}^\star$ is the ``best'' in the $\Theta$ family.
-%
-%$\rightarrow$ Logistic regression commonly used for its robustness to misspecification (no assumption about $p(\bm{x})$).
-%\end{itemize}
-%
-%\footnotesize{
-%\begin{table}[ht]
-%\begin{tabular}{|R{3cm}||C{2cm}|C{2cm}|}
-%\hline \backslashbox{$p_{\bm{\theta}}(y|\bm{x})$}{$p(z|\bm{x},y)$} & MAR & MNAR \\
-%\hline
-%\hline Well specified & $\textcolor{olive}{\bm{\theta}^\star_{\f} = \bm{\theta}^\star}$ & \multirow{2}{*}{\textcolor{red}{$\bm{\theta}^\star_{\f} \neq \bm{\theta}^\star$}} \\ \cline{1-2}
-% Misspecified & \textcolor{red}{$\bm{\theta}^\star_{\f} \neq \bm{\theta}^\star$} & \\
-%\hline 
-%\end{tabular}
-%\label{tableasymptotic}
-%\caption{(Q1) w.r.t. model specification and missingness mechanism}
-%\end{table}
-%}
-%
-%\end{frame}
-%
-%%----------------------------------------------------------------------------------------
-%
-%\subsection{How to use $\mathbf{x}_{\nf}$?}
-%
-%\begin{frame}
-%\frametitle{\secname : \subsecname}
-%
-%\uncover<1->{
-%\textbf{\textcolor{red}{Question 2}:} How to construct a better estimator than $\hat{\bm{\theta}}_{\f}$?
-%}
-%
-%\bigskip
-%
-%\bigskip
-%
-%\uncover<2->{
-%\textbf{\textcolor{red}{Scope for action}:}
-%}
-%\begin{itemize}
-%\only<2-5>{\item Change model space $\Theta$,}
-%\only<6->{\item \sout{Change model space $\Theta$} logistic regression,}
-%\only<3-6>{\item Model acceptance/rejection process (i.e. $p_{\gamma}(z|\bm{x},y)$),}
-%\only<7->{\item \sout{Model acceptance/rejection process (i.e. $p_{\gamma}(z|\bm{x},y)$)}
-%
-%$\gamma$ cannot be estimated,}
-%\item<4-> Use $\mathbf{x}_{\nf}$.
-%\end{itemize}
-%
-%\only<5>{
-%\begin{block}{Natural way to achieve all three: generative approach}
-%\setlength\abovedisplayskip{-5pt}
-%\begin{flalign*}
-%& \hspace{0.4cm} {p_{\textcolor{red}{\alpha}}(\bm{x},y,z) = p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}) p_{\theta_{\textcolor{red}{\alpha}}}(y|x) p_{\gamma_{\textcolor{red}{\alpha}}}(z|\bm{x},y).} &
-%\end{flalign*}
-%\begin{alignat*}{2}
-%& (\fbox{$\hat{\theta}_{\textcolor{red}{\alpha}}$},\hat{\beta}_{\textcolor{red}{\alpha}},\hat{\gamma}_{\textcolor{red}{\alpha}}) && = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \ell({\textcolor{red}{\alpha}};\bm{x},\bm{y}_{\f}) = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \sum_{i=1}^{n }\ln(p_{\theta_{\textcolor{red}{\alpha}}}(y_i|x_i)) \\
-%& && + \sum_{i=1}^{n+n'} \ln(p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}_i)) \left( + \sum_{i=1}^{n} \ln(p_{\gamma_{\textcolor{red}{\alpha}}}(z_i|x_i,y_i)) \right).
-%\end{alignat*}
-%\end{block}
-%}
-%\only<6>{
-%\begin{block}{\sout{Natural way to achieve all three: generative approach}}
-%\setlength\abovedisplayskip{-5pt}
-%\begin{flalign*}
-%& \hspace{0.4cm} {p_{\textcolor{red}{\alpha}}(\bm{x},y,z) = p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}) p_{\theta_{\textcolor{red}{\alpha}}}(y|\bm{x}) p_{\gamma_{\textcolor{red}{\alpha}}}(z|\bm{x},y).} &
-%\end{flalign*}
-%\begin{alignat*}{2}
-%& (\fbox{$\hat{\theta}_{\textcolor{red}{\alpha}}$},\hat{\beta}_{\textcolor{red}{\alpha}},\hat{\gamma}_{\textcolor{red}{\alpha}}) && = \argmax_{\textcolor{red}{\alpha}} \ell({\textcolor{red}{\alpha}};\bm{x},\bm{y}_{\f}) = \argmax_{{{\theta}_{\textcolor{red}{\alpha}}},\beta_{\textcolor{red}{\alpha}},\gamma_{\textcolor{red}{\alpha}}} \sum_{i=1}^{n}\ln(p_{\theta_{\textcolor{red}{\alpha}}}(y_i|x_i)) \\
-%& && + \sum_{i=1}^{n+n'} \ln(p_{\beta_{\textcolor{red}{\alpha}}}(\bm{x}_i)) \left( + \sum_{i=1}^{n} \ln(p_{\gamma_{\textcolor{red}{\alpha}}}(z_i|x_i,y_i)) \right).
-%\end{alignat*}
-%\end{block}
-%}
-%
-%\uncover<8->{
-%%\begin{tikzpicture}
-%%\coordinate (A) at (-1,1);
-%%\coordinate (B) at (3,0.5);
-%%\coordinate (C) at (4,-1);
-%%\coordinate (D) at (1,-1);
-%%\foreach \p in {A,B,C,D}
-%%{\draw[fill=white] (\p) circle (1pt);}
-%%\DrawPotato[blue,fill=red]{A}{B}{C}{D}
-%%\end{tikzpicture}
-%
-%{\bf Remember} that $\mathcal{T}^{\text{OOT}}$ also comes from $p(y | \bm{x}, \f)$ such that applying a \textit{Reject Inference} method and getting a higher Gini is no guarantee that it would on the Through-the-Door population (on the contrary!).
-%}
-%
-%\end{frame}
-
-
-
-
-
-%\begin{frame}
-%\frametitle{\secname: \subsecname}
-%
-%They usually amount to EM-like algorithms:
-%\setbeamercolor{normal text}{fg=black}
-%\usebeamercolor[fg]{normal text}
-%\hspace*{-0.7cm} \[ \textcolor{white}{\mathcal{T}_{\text{c}}^{(1)} = } %\left(
-%\begin{array}{c}
-%\tikzmarkin[hor=style green]{el0} \mathbf{x}_{\f} \tikzmarkend{el0} \\
-%\\
-%\\
-%\tikzmarkin[hor=style green]{el-1} \mathbf{x}_{\nf} \tikzmarkend{el-1} \end{array}
-%%\left( 
-%\begin{array}{ccc}
-%\tikzmarkin[hor=style green]{el1} \; \; x_{1,1} & \cdots & x_{1,d}  \\
-% \vdots & \vdots & \vdots \\
-% x_{n,1} & \cdots & x_{n,d} \\
-% x_{n+1,1} & \cdots & x_{n+1,d}  \\
-% \vdots & \vdots & \vdots \\
-% x_{n+n',1} & \cdots & x_{n+n',d} \tikzmarkend{el1} \end{array},
-% \hspace{0.2cm}
-% \begin{array}{c}
-%\tikzmarkin[hor=style green]{l1} \mathbf{y}_{\f} \tikzmarkend{l1}\\
-%\\
-%\\
-%\tikzmarkin[hor=style green]{l2} \mathbf{y}_{\nf} \tikzmarkend{l2} \end{array}
-%%\left( 
-%\begin{array}{c}
-%\tikzmarkin[hor=style green]{l3} \; \; y_1 \; \; \; \\
-%\vdots \\
-% y_n \\ 
-% \hat{y}_{n+1}^{(1)} \\
-%\vdots \\
-%\hat{y}_{n+n'}^{(1)} \tikzmarkend{l3}\end{array},
-%\hspace{0.2cm} 
-% \begin{array}{c}
-%\tikzmarkin[hor=style green]{el111} \mathbf{z}_{\f} \tikzmarkend{el111}\\
-%\\
-%\\
-%\tikzmarkin[hor=style green]{el121} \mathbf{z}_{\nf} \tikzmarkend{el121}\end{array}
-%%\left( 
-%\begin{array}{c}
-%\tikzmarkin[hor=style green]{e41} \text{f} \\
-%\vdots \\
-%\text{f} \\ 
-%\text{nf} \\
-%\vdots \\
-%\text{nf} \tikzmarkend{e41} \end{array}.\]
-% 
-%\setbeamercolor{normal text}{fg=white}
-%\usebeamercolor[fg]{normal text}
-%
-%\end{frame}
-
- 
- 
- 
- 
- 
-%\begin{frame}
-%\frametitle{\secname : \subsecname}
-%
-%\textbf{Reclassification}\footnote{\cite{RI6,banasik,saporta}} :
-%\[(\hat{\bm{\theta}}^{\text{CEM}}, \textcolor{red}{\hat{\mathbf{y}}^{\nf}}) = \argmax_{\bm{\theta},\textcolor{red}{\mathbf{{y}}^{\nf}}} \ell(\bm{\theta}; \mathcal{T}_c^{(1)}) \text{ where } \textcolor{red}{\hat{y_i}} = \argmax_{y_i} p_{\hat{\bm{\theta}}_{\f}}(y_i|\bm{x}_i).\]
-%\textbf{Problem:} inconsistent estimator.
-%
-%\vspace*{0.2cm}
-%\hspace*{-0.8cm} \centering \includegraphics[width=12cm]{figures/CEM_bias.png}
-%
-%\end{frame}
-%
-%%----------------------------------------------------------------------------------------
-%
-%\begin{frame}
-%\frametitle{\secname : \subsecname}
-%
-%\textbf{Augmentation}\footnote{\cite{RI6,banasik,saporta,economix}}: MAR / misspecified model.
-%\[ \ell_{\text{Aug}}(\bm{\theta}; \mathcal{T}_\f) = \sum_{i=1}^n \textcolor{red}{\frac{1}{p(\text{f}|\bm{x}_i)}} \ln(p_{\bm{\theta}}(y_i|\bm{x}_i)).\]
-%\textbf{Problem:} estimation of $p(\text{f}|x_i)$ + assumes $p(\text{f}|x_i) > 0$ (clearly not true).
-%
-%\medskip
-%
-%\noindent\makebox[\linewidth]{\rule{\paperwidth}{1pt}}
-%
-%\medskip
-%
-%\textbf{Parcelling} \footnote{\cite{RI6,banasik,saporta}}:
-%\[ \ell(\theta; \bm{x},\mathbf{y}_{\f},\textcolor{red}{\mathbf{\hat{y}}_{\nf}}) \text{ where } \textcolor{red}{\hat{y_i}} = \begin{cases} 1 \text{ w.p. } \textcolor{red}{\alpha_i} p_{\hat{\bm{\theta}}_{\f}}(1|\bm{x}_i,\text{f}) \\ 0 \text{ w.p. } 1-\textcolor{red}{\alpha_i} p_{\hat{\bm{\theta}}_{\f}}(1|\bm{x}_i,\text{f}) \end{cases}. \]
-%
-%\textbf{Problem:} MNAR assumptions hidden in $\textcolor{red}{\mathbf{\hat{y}}_{\nf}}$ ($\textcolor{red}{\alpha_i}$) impossible to test.
-%
-%\end{frame}
-
-
-
- 
-%\subsection{Additional remarks} 
-% 
-%\begin{frame}
-%\frametitle{\secname: \subsecname}
-%
-%\begin{animateinline}[autoplay,loop]{2}%
-%{\color{red}{\bf WARNING}}%
-%\newframe \end{animateinline}
-%
-%\medskip
-%
-%All this stands for logistic regression and all ``local'' methods~\cite{zadrozny2004learning}.
-%
-%\medskip
-%
-%All ``global'' methods (explicit or implicit modelling of $p(\bm{x})$) will produce biased estimates under MAR.
-%
-%\medskip
-%
-%We might have:
-%
-%\begin{table}[t]
-%\centering
-%\begin{tabular}{l || l | l}
-%Gini & Logistic regression & Decision trees \\
-%\hline
-%Financed & 40 & 45 \\
-%\textcolor{red}{Through-the-door} & 40 & 35 \\
-%\end{tabular}
-%\end{table}
-%
-%\end{frame}
 
 
 
@@ -1568,22 +1364,67 @@ Reclassification is equivalent to a Classification-EM algorithm, thus introducin
 
 \section{Feature quantization}
 
+\note{Quantification de prédicteurs : discrétisation des prédicteurs continus et regroupement des modalités des prédicteurs catégoriels.
+
+\medskip
+
+A l'origine, un problème essentiellement industriel : avoir une grille de score simple ("je donne 30 points aux personnes mariées, dans tel intervalle de salaire", limiter les coefficients (ne pas avoir une note particulière pour chaque emploi).
+
+\medskip
+
+Cela prend néanmoins un temps considérable au chargé d'études statistiques qui doit faire un score : environ 1 mois dédié à cette tâche exclusivement.
+
+\medskip
+
+D'un point de vue théorique, et pour se replacer dans un cadre académique, la quantification a aussi un avantage majeur pour potentiellement réduire le biais de modèle qu'on va voir sur un exemple.}
+
 
 \subsection{by an example}
 
+
 {
 \setbeamercolor{background canvas}{bg=white}
+
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
+
+%%%%%%%%%%%%%%%%
+\note{
+On simule des données continues $x$ et une étiquette $y$ dont le log odd-ratio dépend du sinus de $x$ : c'est la courbe verte.
+
+\medskip
+
+Une régression logistique linéaire donnerait un seul coefficient nul et estimerait mal la vraie loi, donc avec un biais de modèle important.
+
+\medskip
+
+La discrétisation (en rouge) permet d'approcher la courbe verte de manière arbitrairement précise en faisant varier le nombre de modalités (on ne s'intéresse dans un premier temps pas à la position des points de coupure et la taille des morceaux).
+
+\medskip
+
+En revanche, avec un échantillon de taille fixe, la variance prend rapidement le pas sur le biais.
+
+\medskip
+
+On comprend bien qu'on peut formaliser le problème de quantification comme un problème biais / variance et donc une sélection de modèle.
+
+}
+%%%%%%%%%%%%%%%%
+
+
+
 \begin{figure}[!ht]
-\begin{animateinline}[poster=first, controls=all, palindrome, autopause, autoresume, width=\textwidth, height=6cm]{3}
-\multiframe{99}{i=2+1}{\input{CODE_FIGURES/EXAMPLE_DISC/disc_plot\i.tex}}%
-\end{animateinline}
+%\begin{animateinline}[poster=first, controls=all, palindrome, autopause, autoresume, width=\textwidth, height=6cm]{3}
+%\multiframe{99}{i=2+1}{\input{CODE_FIGURES/EXAMPLE_DISC/disc_plot\i.tex}}%
+%\end{animateinline}
 \end{figure}
 
 \end{frame}
 }
+
+
+
 
 
 \subsection{some more notations}
@@ -1591,18 +1432,32 @@ Reclassification is equivalent to a Classification-EM algorithm, thus introducin
 \begin{frame}[allowframebreaks]
 \frametitle{\secname: \subsecname}
 
-%\begin{block}{Raw data}
-%\vspace*{-0.9cm}
-%\begin{align*}
-%\bx & =(x_1,\dots,x_d) \\
-%x_j & \in \mathbb{R} \text{ (continuous case)} \\
-%x_j & \in \{1,\dots,l_j\} \text{ (categorical case)} \\
-%y & \in \{0,1\} \text{ (target)}
-%\end{align*}
-%\vspace*{-0.7cm}
-%\end{block}
-%
-%\bigskip
+
+
+%%%%%%%%%%%%%%%%
+\note{
+Pour ce faire, on introduit quelques nouvelles notations.
+
+\medskip
+
+q désigne la fonction de quantification, qui s'applique composante par composante et dont chaque composante est elle-même un vecteur de binaires.
+
+\medskip
+
+c-à-d que ce sont des indicatrices qui testent si l'observation d'un prédicteur appartient à un ensemble $C_{j,h}$ qu'on détaille dans la suite.
+
+\medskip
+
+remarquons tout de suite qu'a priori, à matrice de design fixe, le nombre de fonctions q qui répondent à cette définition est très grand. On devra donc faire du choix de modèle dans un très grand espace.
+
+
+
+}
+%%%%%%%%%%%%%%%%
+
+
+
+
 
 \begin{block}{Quantized data}
 \vspace*{-0.9cm}
@@ -1616,10 +1471,12 @@ Reclassification is equivalent to a Classification-EM algorithm, thus introducin
 \end{block}
 
 \begin{animateinline}[autoplay,loop]{2}%
-{\color{red}{\bf Huge cardinality!}}%
+{\color{orange}{\bf Huge cardinality!}}%
 \newframe \end{animateinline}
 
 \pagebreak
+
+\note<2->{Dans le cas des prédicteurs continus, les ensembles $C_{j,h}$ sont simplement des intervalles contigüs définis par des points de coupures $c_{j,h}$ minuscule : les points orange sur l'exemple ci-dessous, où le résultat de la quantification du prédicteur dans cet intervalle donne (1,0,0), dans cet intervalle, ...}
 
 \begin{block}{Discretization}
 \vspace*{-0.4cm}
@@ -1634,8 +1491,8 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \begin{tikzpicture}[scale=0.3]
 \draw[->,line width=0.1cm] (-5,0)--(24,0) node[right]{$x_j$};
 
-\node [red,circle, fill] at (4,0) {};
-\node [red,circle, fill] at (12,0) {};
+\node [orange,circle, fill] at (4,0) {};
+\node [orange,circle, fill] at (12,0) {};
 
 \node at (4,-1.5) {$c_{j,1}$};
 \node at (12,-1.5) {$c_{j,2}$};
@@ -1648,6 +1505,8 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \end{center}
 
 \pagebreak
+
+\note<3->{Dans le cas des prédicteurs catégoriels, on a simplement la condition que les ensembles $C_{j,h}$ doivent recouvrir les modalités de départ du prédicteur, et que leur intersection deux à deux soit vide.}
 
 \begin{block}{Grouping}
 \vspace*{-0.4cm}
@@ -1687,17 +1546,29 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \end{tikzpicture}
 \end{center}
 
+\pagebreak
+
+\note<4->{On suppose qu'il y a une vraie quantification et un vrai paramètre de régression logistique conditionnelle à cette quantification qui a généré les données. La formalisation apportée par le statisticien au problème industriel c'est qu'on peut se donner un critère de sélection de modèle, par exemple BIC pour être consistant dans la présentation, mais ce pourrait très bien être un autre. Le problème majeur de cette approche, c'est que l'espace de recherche est énorme...}
+
 \begin{block}{Oracle}
 \vspace*{-0.4cm}
+\begin{minipage}[c]{0.15\linewidth}
+\begin{animateinline}[autoplay,loop]{2}%
+{\color{orange}{\bf Statistician}}%
+\newframe \end{animateinline}
+\end{minipage}
+\begin{minipage}[c]{0.8\linewidth}
 \begin{align*}
 \bm{\theta}^\star, \q^\star = & \argmax_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \mathbb{E}_{\bm{x},y} \left[\ln p_{\bm{\theta}}(y | \q(\bm{x}))\right], \\
 \hat{\bm{\theta}}^{\text{BIC}}, \hat{\q}^{\text{BIC}} = & \argmin_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}, \textcolor{yellow}{\q \in \bm{Q}}} \text{BIC}(\hat{\bm{\theta}}_{\q}; \bm{\mathbf{y}}_{\text{f}}, \q(\bm{\mathbf{x}}_{\text{f}})), \\
 & \text{where } \hat{\bm{\theta}}_{\q} = \argmax_{\bm{\theta} \in \bm{\Theta}_{\textcolor{yellow}{\q}}} \ell(\bm{\theta} ; \bm{\mathbf{y}}_{\text{f}}, \q(\bm{\mathbf{x}}_{\text{f}})).
 \end{align*}
-\vspace*{-0.2cm}
+\end{minipage}
+%\vspace*{-0.2cm}
 \end{block}
 
 \end{frame}
+
 
 
 
@@ -1708,6 +1579,21 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
+
+%%%%%%%%%%%%%%%%
+\note{
+
+... de sorte qu'il faille se tourner vers des heuristiques
+
+\bigskip
+
+Ne pas chercher à lire ce transparent : il faut comprendre que c'est un problème aussi bien industriel qu'académique par le nombre de méthodes proposées dans la litérature, et que cela peut être dangereux d'un point de vue prédictif, de mal quantifier (d'où le temps alloué à cette tâche au chargé d'études).
+
+}
+%%%%%%%%%%%%%%%%
+
+
+
 \vspace*{-0.25cm}
 \begin{center}
 \includegraphics[scale=0.3]{figures/taxonomy.PNG}
@@ -1715,13 +1601,29 @@ where $c_{j,1},\ldots,c_{j,m_j-1}$ are increasing numbers called cutpoints, $c_{
 \vspace*{-0.2cm}
 These approaches (\cite{wrapper2}) maximize an ``intermediary'' criterion, \textit{e.g.}:
 \vspace*{-0.1cm}
+\begin{minipage}[c]{0.15\linewidth}
+\begin{animateinline}[autoplay,loop]{2}%
+{\color{orange}{\bf CACF}}%
+\newframe \end{animateinline}
+\end{minipage}
+\begin{minipage}[c]{0.8\linewidth}
 \[ \hat{\q}_j^{\chi^2} = \argmax_{\q_j} \chi^2(\q_j(\mathbf{x}_\text{f}), \mathbf{y}_\text{f}) \stackrel{?}{\approx} \q^\star_j, \]
+\end{minipage}
 \vspace*{-0.1cm}
 and we {\bf hope} that it's aligned with our original goal s.t.:
-\vspace*{-0.1cm}
+%\vspace*{-0.1cm}
+
+\begin{minipage}[c]{0.15\linewidth}
+\begin{animateinline}[autoplay,loop]{2}%
+{\color{orange}{\bf CACF}}%
+\newframe \end{animateinline}
+\end{minipage}
+\begin{minipage}[c]{0.8\linewidth}
 \[ \hat{\bm{\theta}}^{\chi^2} = \argmax_{\bm{\theta}} \ell(\bm{\theta} ; \mathbf{y}_\text{f}, {\hat{\q}^{\chi^2}}(\mathbf{x}_\text{f})) \stackrel{?}{\approx} \bm{\theta}^\star. \]
+\end{minipage}
 
 \end{frame}
+
 
 
 
@@ -1730,6 +1632,28 @@ and we {\bf hope} that it's aligned with our original goal s.t.:
 \subsection{approximation}
 \begin{frame}
 \frametitle{\secname: \subsecname}
+
+%%%%%%%%%
+\note{
+On a décidé de prendre une toute autre proche, toujours dans l'espoir d'apporter une formalisation et une résolution plus directe au problème original de sélection de modèle.
+
+\bigskip
+
+La première difficulté réside dans le fait que la quantification est un problème discret qu'on peut donc difficilement optimiser directement sans tester toutes les combinaisons
+
+\bigskip
+
+C'est pourquoi on relaxe le problème en paramétrant la quantification q par alpha, c'est-à-dire à utiliser des fonctions "douces", continues et dérivables de type softmax.
+
+\bigskip
+
+On peut l'interpréter comme la possibilité d'être dans plusieurs intervalles simultanément à des proportions différentes, ce qu'on peut simplement illustrer...
+
+
+}
+%%%%%%%%%
+
+
 
 \begin{equation*}
     \q_{\ag_j}(\cdot)=\left(q_{\ag_{j,h}}(\cdot)\right)_{h=1}^{m_j} \text{ with } \begin{cases} \sum_{h=1}^{m_j}q_{\ag_{j,h}}(\cdot)=1, \\ 0 \leq q_{\ag_{j,h}}(\cdot) \leq 1, \end{cases}
@@ -1754,6 +1678,25 @@ and we {\bf hope} that it's aligned with our original goal s.t.:
 \subsection{estimation MAP}
 \begin{frame}
 \frametitle{\secname : \subsecname}
+
+
+%%%%%%%%%%
+\note{
+
+... avec 3 softmax cherchant à estimer 3 vraies quantifications dont les points de coupure sont en orange
+
+\bigskip
+
+Dans cet exemple, on a par exemple une proba de 80 pourcent d'être dans le premier intervalle, de 15 pourcent dans le second et de 5 pourcent dans le dernier.
+
+\bigskip
+
+A supposer qu'on puisse estimer les paramètres alpha chapeau donnés ici, on peut même "forcer" la quantification "douce" q alpha à redevenir une vraie quantification, c'est-à-dire des créneaux, en réalisant une estimation du maximum a posteriori : là où la première modalité est "majoritaire" donc > 33 pourcent dans cet exemple, on considère que c'est le premier intervalle. Ca nous permet de retrouver les points de coupure orange.
+
+}
+%%%%%%%%%%
+
+
 \vspace*{-0.2cm}
 
 \[ \hat{\s}_{j,h}(x_j) = 1 \text{ if } h = \argmax_{1 \leq h' \leq m_j} \s_{\hat{\ag}_{j,h'}}, 0 \text{ otherwise.} \]
@@ -1773,8 +1716,8 @@ and we {\bf hope} that it's aligned with our original goal s.t.:
   ]
     
   \addplot [very thick,white] {gauss(-1.8,0.6)};
-\addplot+[mark=none,thick,red] coordinates {(-0.7,0) (-0.7,0.6)};
-\addplot+[mark=none,thick,red] coordinates {(1,0) (1,0.6)};
+\addplot+[mark=none,ultra thick,orange] coordinates {(-0.7,0) (-0.7,0.6)};
+\addplot+[mark=none,ultra thick,orange] coordinates {(1,0) (1,0.6)};
 \node at (axis cs:-1.1,0.4) {$\hat{\s}_{j,1}(x_j)=1$};
 \node at (axis cs:0,0.4) {$\hat{\s}_{j,1}(x_j)=0$};
 \node at (axis cs:1.5,0.4) {$\hat{\s}_{j,1}(x_j)=0$};
@@ -1799,8 +1742,8 @@ and we {\bf hope} that it's aligned with our original goal s.t.:
   ]
     
   \addplot [very thick,white] {gauss(0,0.6)};
-\addplot+[mark=none, thick,red] coordinates {(-0.7,0) (-0.7,0.6)};
-\addplot+[mark=none, thick,red] coordinates {(1,0) (1,0.6)};
+\addplot+[mark=none, ultra thick,orange] coordinates {(-0.7,0) (-0.7,0.6)};
+\addplot+[mark=none, ultra thick,orange] coordinates {(1,0) (1,0.6)};
 \node at (axis cs:-1.1,0.4) {$\hat{\s}_{j,2}(x_j)=0$};
 \node at (axis cs:0,0.4) {$\hat{\s}_{j,2}(x_j)=1$};
 \node at (axis cs:1.5,0.4) {$\hat{\s}_{j,2}(x_j)=0$};
@@ -1827,8 +1770,8 @@ and we {\bf hope} that it's aligned with our original goal s.t.:
     
   \addplot [very thick,white] {gauss(2,0.6)};
 
-\addplot+[mark=none, thick,red] coordinates {(-0.7,0) (-0.7,0.6)};
-\addplot+[mark=none, thick,red] coordinates {(1,0) (1,0.6)};
+\addplot+[mark=none, ultra thick,orange] coordinates {(-0.7,0) (-0.7,0.6)};
+\addplot+[mark=none, ultra thick,orange] coordinates {(1,0) (1,0.6)};
 
 \node at (axis cs:-1.1,0.4) {$\hat{\s}_{j,3}(x_j)=0$};
 \node at (axis cs:0,0.4) {$\hat{\s}_{j,3}(x_j)=0$};
@@ -1850,6 +1793,24 @@ and we {\bf hope} that it's aligned with our original goal s.t.:
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
+
+
+%%%%%%%%%%
+\note{
+Pour estimer de bons paramètres alpha, on se plonge encore une fois dans le cadre de la vraisemblance...
+
+\bigskip
+
+... qu'on aimerait maximiser en $\theta$ et $\alpha$ ce qui nous conduirait, d'après les propriétés du maximum de vraisemblance, à retrouver au moins asymptotiquement le vrai mécanisme de génération des données, c-à-d la vraie quantification
+
+\bigskip
+
+sauf que on ne peut pas maximiser cette vraisemblance directement, donc on utilise également une heuristique : la descente de gradient.
+
+}
+%%%%%%%%%%
+
+
 
 We wish to maximize the following likelihood:
 \[ (\hat{\bm{\theta}}, \hat{\bm{\alpha}}) = \argmax_{\bm{\theta}, \bm{\alpha}} \ell(\bm{\theta}, \bm{\alpha} ; \bm{\mathbf{x}}_\f, \bm{\mathbf{y}}_\f) = \argmax_{\bm{\theta}, \bm{\alpha}} \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i | \q_{\alpha}(\bm{x}_i)). \]
@@ -1885,6 +1846,22 @@ We wish to maximize the following likelihood:
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
+
+%%%%%%%%%%
+\note{C'est là que la paramétrisation sous la forme de softmax prend son sens puisqu'on peut écrire le modèle comme un réseau de neurones très simple.
+
+\bigskip
+
+On peut donc s'appuyer sur les librairies logicielles standards de réseaux de neurones, qui marchent bien et très vite.
+}
+%%%%%%%%%%
+
+
+Very simple neural network.
+
+Very fast implementations available, \textit{e.g.}\ TensorFlow.
+
+\textbf{No guarantee} of global optimum (but works well in practice).
 
 \def\layersep{2.5cm}
 
@@ -1957,38 +1934,6 @@ We wish to maximize the following likelihood:
 
 
 
-%\begin{frame}
-%\frametitle{\secname: \subsecname}
-
-% \newlength\figureheight
-% \newlength\figurewidth
-% \setlength\figureheight{3cm}
-% \setlength\figurewidth{\textwidth}
-
-
-%  \begin{figure}[!ht]
-%    \centering
-%    \begin{subfigure}[t]{\textwidth}
-%        \centering
-%        \input{True_simulated_data/feature_0_iteration_5.tex}
-%        \vspace{-0.5cm}
-%        \caption{Quantization $\hat{\q}^{(s)}_1({x}_1)$ resulting from the MAP at iter $t = 5$ and $m_{\text{max}} = 3$.}
-%    \end{subfigure}%
-%    
-%    \begin{subfigure}[t]{\textwidth}
-%        \centering
-%        \input{True_simulated_data/feature_0_iteration_300.tex}
-%        \vspace{-0.5cm}
-%        \caption{Quantizations $\hat{\q}^{(s)}_1({x}_1)$ resulting from the MAP at iter $t = 300$ and $m_{\text{max}} = 3$.}
-%    \end{subfigure}
-%    
-%    \caption{\label{fig:MAP} Quantizations $\hat{\q}^{(s)}_1({x}_1)$ of experiment (a) resulting from the thresholding (\ref{eq:ht}).}
-%\end{figure}
-
-%\end{frame}
-
-
-
 \newlength\figureheight
 \newlength\figurewidth
 \setlength\figureheight{7cm}
@@ -1997,14 +1942,31 @@ We wish to maximize the following likelihood:
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
+%%%%%%%%%%
+\note{On peut donc regarder les estimations successives des paramètres alpha et les quantifications "douces" qui en résultent quand on simule une vraie discrétisation à 3 modalités avec 5 softmax (donc 5 modalités au maximum).
+
+\bigskip
+
+Les vrais points de coupure sont en pointillés (1/3 et 2/3).
+
+\bigskip
+
+Au départ, seuls 2 softmax s'activent et au fur et à mesure des itérations, on a bien 3 softmax qui ressemblent à des créneaux.
+}
+%%%%%%%%%%
+
+
+
 \begin{figure}
 \hspace*{-1cm}
-\begin{animateinline}[poster=first, controls, buttonfg=white]{3}
-\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_NN/feature_0_iteration_\i.tex}}%
-\end{animateinline}
+%\begin{animateinline}[poster=first, controls, buttonfg=white]{3}
+%\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_NN/feature_0_iteration_\i.tex}}%
+%\end{animateinline}
 \end{figure}
 
 \end{frame}
+
+
 
 
 
@@ -2013,7 +1975,32 @@ We wish to maximize the following likelihood:
 \begin{frame}
 \frametitle{\secname : \subsecname}
 
-\begin{block}{New model selection criterion}
+
+%%%%%%%%%%
+\note{
+Ces pas de descente de gradient fournissent autant de quantifications candidates, a priori tournant en distribution autour du lieu du maximum de vraisemblance, que l'on peut passer à la moulinette du critère de sélection de modèle qu'on s'est donné au départ, BIC ici.
+
+\medskip
+
+Un élément important caché dans la présentation est le nombre de modalités que l'on cherche par variable quantifié, que l'on range dans le vecteur m et qui était en fait fixé par la structure du réseau de neurones : c'est-à-dire que sur l'exemple précédent, si on se done 5 softmax, on ne pourra avoir plus de 5 modalités à la fin.
+
+\medskip
+
+Il faudrait donc a priori boucler sur ce paramètre vectoriel discret, ce qui est bien moins combinatoire que le problème de départ mais quand même intractable.
+
+\medskip
+
+En pratique comme on l'a vu sur l'exemple, sur le support des observations de la variable prédictive, on a d'abord 2 puis 3 modalités seulement, ce qui était le vrai nombre de modalités, alors qu'on pouvait en avoir au maximum 5.
+
+\medskip
+
+Autrement dit, on peut se permettre de fixer cet hyperparamètre à un nombre maximum et laisser le critère de sélection de modèle opérer.
+
+}
+%%%%%%%%%%
+
+
+\begin{block}{Quantization provider to original selection criterion}
 We have drastically restricted the search space to \textit{iter} well-chosen candidates resulting from the the gradient descent steps.
 \[ s^\star = \argmin_{s = 1, \ldots, \textit{iter}} \text{BIC}(\hat{\bth}_{\hat{\q}^{(s)}}) \]
 \end{block}
@@ -2041,162 +2028,6 @@ Start with $\bm{m} = (m_{\text{max}})_1^d$ and ``wait'' \dots
 
 
 
-%\subsection{SEM-Gibbs}
-%
-%\begin{frame}
-%\frametitle{\secname : \subsecname}
-%
-%Originally (and as implemented in the \textsc{R} package glmdisc), the optimization was a bit different:
-%\begin{itemize}
-%\item<2-> $\q$ is considered a latent (unobserved) feature;
-%\item<3-> A classical EM algorithm is intractable since it requires an Expectation step over all possible quantizations;
-%\item<4-> Solution: random draw $\approx$ Bayesian statistics;
-%\end{itemize}
-%
-%\end{frame}
-%
-%
-%\begin{frame}
-%\frametitle{\subsecname: estimation}
-%
-%``Classical'' estimation strategy with latent variables: EM algorithm.
-%
-%\bigskip
-%
-%\uncover<2->{
-%There would still be a sum over $\bm{\mathcal{Q}}_{\bm{m}}$: $p(y|\bm{x},\bm{\theta},\bm{\alpha}) = \sum_{\q \in \bm{\mathcal{Q}}_{\bm{m}}} p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha}_j}(\q_j|x_j)$
-%}
-%
-%\bigskip
-%
-%\uncover<3->{
-%Use a Stochastic-EM! Draw $\q$ knowing that:
-%}
-%\medskip
-%\uncover<4->{
-%\[p(\q|\bm{x},y) = \underbrace{\dfrac{p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha_j}}(\q_j|x_j)}{\sum_{\bm{q} \in \bm{\mathcal{Q}}_{\bm{m}}} p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha}_j}(\q_j|x_j)}}_{\text{still difficult to calculate}}\]
-%}
-%\medskip
-%\uncover<5->{
-%Gibbs-sampling step:
-%\[p(\q_j|\bm{x},y,\q_{\{-j\}}) \propto p_{\bm{\theta}}(y|\q) p_{\bm{\alpha_j}}(\q_j|x_j)\]
-%}
-%
-%
-%\end{frame}
-%
-%
-%
-%
-%\begin{frame}
-%\frametitle{\subsecname: algorithm}
-%
-%\tiny
-%
-%
-%\textbf{Initialization}
-%
-%
-%\medskip
-%
-%$\left( \begin{array}{ccc}
-%x_{1,1} & \cdots & x_{1,d}  \\
-% \vdots & \vdots & \vdots \\
-% x_{n,1} & \cdots & x_{n,d} \end{array} \right)
-%\begin{array}{c}
-%\text{at random} \\
-%\Rightarrow \end{array}
-%\left( \begin{array}{ccc}
-%\q_{1,1} & \cdots & \q_{1,d}  \\
-% \vdots & \vdots & \vdots \\
-% \q_{n,1} & \cdots & \q_{n,d} \end{array} \right)$
-%
-%\medskip
-%
-%\textbf{Loop}
-%
-%\medskip
-%
-%$\left( \begin{array}{c}
-%y_1 \\
-%\vdots \\
-%y_n \end{array} \right)
-%\begin{array}{c}
-%\text{logistic} \\
-%\text{regression} \\
-%\Rightarrow \end{array}
-%\left( \begin{array}{ccc}
-%\q_{1,1} & \cdots & \q_{1,d}  \\
-% \vdots & \vdots & \vdots \\
-% \q_{n,1} & \cdots & \q_{n,d} \end{array} \right)
-%\begin{array}{c}
-%\text{polytomous} \\
-%\text{regression} \\
-%\Rightarrow \end{array}
-%\left( \begin{array}{ccc}
-%x_{1,1} & \cdots & x_{1,d}  \\
-% \vdots & \vdots & \vdots \\
-% x_{n,1} & \cdots & x_{n,d} \end{array} \right)
-%$
-%
-%\medskip
-%
-%\textbf{Updating $\q$}
-%
-%\medskip
-%
-%$\left( \begin{array}{c}
-%p(y_1,\q_{1,j}=k|\bm{x}_i)  \\
-%\vdots \\
-%p(y_n,\q_{n,j}=k|\bm{x}_i) \end{array} \right)
-%\begin{array}{c}
-%\text{random} \\
-%\text{sampling} \\
-%\Rightarrow \end{array}
-%\left( \begin{array}{ccc}
-%\q_{1,j}  \\
-% \vdots \\
-% \q_{n,j} \end{array} \right)$
-%
-%\medskip
-%
-%\textbf{Calculating $\q^{\text{MAP}}$}
-%
-%\medskip
-%
-%$\left( \begin{array}{c}
-%\q^{\text{MAP},1,j}  \\
-%\vdots \\
-%\q^{\text{MAP},n,j} \end{array} \right)
-%\begin{array}{c}
-%\text{MAP} \\
-%\text{estimate} \\
-%= \end{array}
-%\left( \begin{array}{ccc}
-%\argmax_{\q_j} p_{\bm{\alpha_j}}(\q_j | x_{1,j})  \\
-% \vdots \\
-%\argmax_{\q_j} p_{\bm{\alpha_j}}(\q_j | x_{n,j}) \end{array} \right)$
-% 
-% 
-%\normalsize
-%
-%\end{frame}
-%
-%
-%
-%
-%
-%
-%\begin{frame}
-%\frametitle{\secname}
-%
-%\begin{figure}
-%%\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{5}
-%%\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_SEM/sem_feature_1_iter_\i.tex}}%
-%%\end{animateinline}
-%\end{figure}
-%
-%\end{frame}
 
 
 
@@ -2207,6 +2038,24 @@ Start with $\bm{m} = (m_{\text{max}})_1^d$ and ``wait'' \dots
 \begin{frame}
 
 \frametitle{\secname: \subsecname}
+
+
+%%%%%%%%%%
+\note{
+On peut vérifier la consistance empirique de l'approche proposée en simulant les mêmes données que sur l'exemple.
+
+\bigskip
+
+On s'aperçoit qu'on estime très bien les points de coupure et le vrai nombre de modalités.
+
+\bigskip
+
+On arrive même à faire de la sélection de variable puisqu'en ajoutant une variable $x_3$ qui n'apporte rien à la prédiction de $y$, on produit dans 88 cas sur 100 une seule modalité de quantification, c-à-dire que la variable sort du modèle.
+
+}
+%%%%%%%%%%
+
+
 
 Simulated data
 
@@ -2229,165 +2078,34 @@ $10{,}000$ & $[0.666,0.666]$ & \myobar{0}{100}{0} & \mybar{88}{12}{0}
 
 
 
-%\begin{frame}
-%
-%\frametitle{\secname: \subsecname}
-%
-%UCI data
-%
-%\medskip
-%
-%\begin{table}
-%    \centering
-%        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc} and two baselines: ALLR and MDLP / $\chi^2$ tests obtained on several benchmark datasets from the UCI library.}
-%    \label{tab:banchmark}
-%\begin{tabular}{llll}
-%Dataset & ALLR & MDLP/$\chi^2$ & \textit{glmdisc} \\
-%\hline
-%Adult & 81.4 (1.0) & \textcolor{green}{85.3} (0.9) & 80.4 (1.0) \\
-%Australian & 72.1 (10.4) & 84.1 (7.5) & \textcolor{green}{92.5} (4.5) \\
-%Bands & 48.3 (17.8) & 47.3 (17.6) & \textcolor{green}{58.5} (12.0) \\
-%Credit & 81.3 (9.6) & 88.7 (6.4) & \textcolor{green}{92.0} (4.7) \\
-%German & 52.0 (11.3) & 54.6 (11.2) & \textcolor{green}{69.2} (9.1) \\
-%Heart & 80.3 (12.1) & 78.7 (13.1) & \textcolor{green}{86.3} (10.6)
-%\end{tabular}
-%\end{table}
-%
-%
-%\end{frame}
-%
-%
-%
-%\begin{frame}
-%
-%\frametitle{\secname: \subsecname}
-%
-%CACF data
-%
-%\medskip
-%
-%\begin{table}
-%    \centering
-%        \caption{Gini indices (the greater the value, the better the performance) of our proposed quantization algorithm \textit{glmdisc}, the two baselines of Table~\ref{tab:banchmark} and the current scorecard (manual / expert representation) obtained on several portfolios of Cr\'edit Agricole Consumer Finance.}
-%    \label{tab:real_data}
-%\resizebox{.86\textwidth}{!}{\begin{tabular}{lllll}
-%Portfolio & ALLR & Current & MDLP/$\chi^2$ & \textit{glmdisc} \\
-%\hline
-%Automobile & \textcolor{green}{59.3} (3.1) & 55.6 (3.4) & \textcolor{green}{59.3} (3.0) & 58.9 (2.6) \\
-%Renovation & 52.3 (5.5) & 50.9 (5.6) & 54.0 (5.1) & \textcolor{green}{56.7} (4.8) \\
-%Standard & 39.7 (3.3) & 37.1 (3.8) & \textcolor{green}{45.3} (3.1) & 44.0 (3.1) \\
-%Revolving & 62.7 (2.8) & 58.5 (3.2) & \textcolor{green}{63.2} (2.8) & 62.3 (2.8) \\
-%Mass retail & 52.8 (5.3) & 48.7 (6.0) & 61.4 (4.7) & \textcolor{green}{61.8} (4.6) \\
-%Electronics & 52.9 (11.9) & 55.8 (10.8) & 56.3 (10.2)  & \textcolor{green}{72.6} (7.4)
-%\end{tabular}}
-%\end{table}
-%
-%%See \href{https://gist.github.com/adimajo/eb007492007d650091f6bd7cb2047493}{this gist} for $\chi^2$ automated grouping tests.
-%
-%\end{frame}
 
-
-
-
-
-
-\section{Bivariate interactions}
-
-\subsection{notations}
-
-\begin{frame}<presentation:0>[noframenumbering]
-\frametitle{\secname: \subsecname}
-
-Upper triangular matrix with $\delta_{k,\ell} = 1 $ if $k < \ell$ and features $k$ and $\ell$ ``interact'' in the logistic regression.
-\[ \text{logit}(p_{\bm{\theta}}(1|\q(\bm{x}))) = \theta_0 + \sum_{j=1}^{d} \theta_j^{\q_j(x_j)} + \sum_{1\leq k < \ell \leq d} \delta_{k,\ell} \theta_{k,\ell}^{\q_k(x_k) f_{\ell}(x_{\ell})} \]
-\uncover<2->{
-Imagine for now that the discretization $\q(\bm{x})$ is fixed. The criterion becomes:
-\begin{align*}
-(\bm{\theta}^\star,\bm{\delta}^\star) & = \argmax_{\bm{\theta},\textcolor{yellow}{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}}} \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i|\q(\bm{x}_i),\bm{\delta}) - \text{penalty}(n;\bm{\theta}) 
-\end{align*}
-}
-\uncover<3->{
-Analogous to previous problem: $2^{\frac{d(d-1)}{2}}$ models.
-}
-
-
-\end{frame}
-
-\subsection{model proposal}
-\begin{frame}<presentation:0>[noframenumbering]
-\frametitle{\secname: \subsecname}
-
-$\delta$ is latent and hard to optimize over: use a stochastic algorithm!
-
-\bigskip
-
-\uncover<2->{
-Strategy used here: Metropolis-Hastings sampling algorithm.
-
-{\bf Idea:} propose well-chosen interactions and accept / reject them based on the BIC criterion of the resulting logistic regression.
-}
-
-\only<3>{
-\begin{align*}
-p(y|\bqk ) & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \bqk, \bm{\delta}) p(\bm{\delta}) \\
-p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) p(\bm{\delta})
-\end{align*}
-}
-\uncover<4->{
-\begin{align*}
-p(y| \bqk ) & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \bqk, \bm{\delta}) p(\bm{\delta}) \\
-p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) \textcolor{yellow}{\cancel{p(\bm{\delta})}} \hspace{1cm} p(\delta_{p,q}) = \frac{1}{2}
-\end{align*}
-}
-\uncover<5->{
-Which transition proposal $\tr: ({\{0,1\}}^{\frac{d(d-1)}{2}},{\{0,1\}}^{\frac{d(d-1)}{2}}) \mapsto [0 ; 1]$?
-}
-
-\end{frame}
-
-\begin{frame}<presentation:0>[noframenumbering]
-\frametitle{\secname: \subsecname}
-
-$2^{d(d-1)}$ probabilities to calculate\dots
-
-\bigskip
-
-\uncover<2->{
-\textbf{We restrict changes to only one entry $\delta_{k,\ell}$.}
-}
-
-\bigskip
-
-\uncover<3->{
-\textbf{Proposal:} gain/loss in BIC between \textcolor{yellow}{bivariate} models \textcolor{yellow}{with} / \textcolor{yellow}{without} the interaction.
-}
-
-\bigskip
-
-\uncover<4->{
-If the interaction between two features is meaningful when only these two features are considered, there is a good chance that it will be in the full multivariate model.
-}
-
-\bigskip
-
-\uncover<5->{
-\textbf{Trick:} alternate one discretization  / grouping step and one ``interaction'' step.
-}
-
-\end{frame}
-
-
-
-
-
-
-
-
-
-\subsection{results}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
+
+
+%%%%%%%%%%
+\note{
+Sur des données de benchmark du répertoire UCI avec des données mixtes, on se compare ensuite à la régression logistique linéaire, qui ne montre jamais la meilleure performance sur ces exemples, aux méthodes ad hoc de type Chi 2 pour les catégoriels et MDLP pour les continus.
+
+\medskip
+
+On a appelé l'approche présentée jusqu'à présent glmdisc-NN pour réseau de neurones, on avait également développé un autre algorithme d'optimisation basé sur l'algorithme EM et sur lequel on a bati la brique de recherche d'interactions
+
+\medskip
+
+Pour rappel, ce sont des paires de prédicteurs, quantifiés, dont on fait une sorte de produit. Ca revient à estimer un coefficient de régression logistique pour chaque combinaison des deux prédicteurs. La recherche se fait dans un espace encore beaucoup plus grand que l'espace de quantification seul mais permet potentiellement de réduire encore le biais de modèle en flexibilisant la régression logistique.
+
+\medskip
+
+Sauf pour le premier jeu de données, on obtient systématiquement les meilleurs résultats avec l'une des 2 techniques d'optimisation et éventuellement les interactions...
+
+}
+%%%%%%%%%%
+
+
+
+
 
 Données UCI
 
@@ -2403,7 +2121,7 @@ Adult & 81.4 (1.0) & \textcolor{green}{\textbf{85.3}} (0.9) & 80.4 (1.0) & 81.5 
 Australian & 72.1 (10.4) & 84.1 (7.5) & 92.5 (4.5) & \textcolor{green}{\textbf{100}} (0) & \textcolor{green}{\textbf{100}} (0 - no interaction) \\
 Bands & 48.3 (17.8) & 47.3 (17.6) & 58.5 (12.0) & \textcolor{green}{\textbf{58.7}} (12.0) & \textcolor{green}{\textbf{58.8}} (13.0) \\
 Credit & 81.3 (9.6) & 88.7 (6.4) & \textcolor{green}{\textbf{92.0}} (4.7) & 87.7 (6.4) & 87.7 (6.4 - no interaction) \\
-German & 52.0 (11.3) & 54.6 (11.2) & \textcolor{green}{\textbf{69.2}} (9.1) & 54.5 (10) &  \\
+German & 52.0 (11.3) & 54.6 (11.2) & \textcolor{green}{\textbf{69.2}} (9.1) & 54.5 (10) & 56.5 (9.0) \\
 Heart & 80.3 (12.1) & 78.7 (13.1) & \textcolor{green}{\textbf{86.3}} (10.6) & 82.2 (11.2) & 84.5 (10.8)
 \end{tabular}
 }
@@ -2413,8 +2131,25 @@ Heart & 80.3 (12.1) & 78.7 (13.1) & \textcolor{green}{\textbf{86.3}} (10.6) & 82
 
 
 
+
+
 \begin{frame}
 \frametitle{\secname : \subsecname}
+
+
+%%%%%%%%%%
+\note{
+Ce qu'on peut également vérifier sur d'autres types de données disponibles dans R où la régression logistique, éventuellement avec interactions est souvent utilisée, en l'occurence les applications médicales
+
+\bigskip
+
+Les interactions prennent tout leur sens et produisent les meilleurs résultats, sauf pour le jeu de données Pima où la régression logistique linéaire donne les meilleurs résultats
+
+}
+%%%%%%%%%%
+
+
+
 
 Medicine data
 
@@ -2441,8 +2176,27 @@ glmdisc w. interactions & 62.0 & \textcolor{green}{\textbf{95.0}} & \textcolor{g
 
 
 
+
 \begin{frame}
 \frametitle{\secname : \subsecname}
+
+%%%%%%%%%%
+\note{
+On vérifie bien sûr que ça fonctionne sur les données CACF où on obtient aussi de très bons résultats, sauf qu'ils sont rarement significativement meilleurs.
+
+\bigskip
+
+Néanmoins, le gain principal de cette partie de thèse pour CACF se situe plutôt dans le gain de temps significatif du chargé d'études statistiques qui consacre un bon mois à la quantification pour la construction d'un score, ce qui est ici substitué par du temps machine.
+
+\bigskip
+
+De plus, on utilise la même dizaine de données depuis assez longtemps, donc a priori on est très proche de l'erreur de Bayes même avec des données quantifiées manuellement.
+}
+%%%%%%%%%%
+
+
+
+
 
 CACF data
 
@@ -2470,33 +2224,7 @@ Electronics & 52.9 (11.9) & 55.8 (10.8) & 56.3 (10.2)  & \textcolor{green}{\bf{7
 
 
 
-\begin{frame}
-\frametitle{\secname : \subsecname}
 
-Older results
-
-\begin{table}[t]
-\begin{center}
-\begin{adjustbox}{max width=0.99\textwidth}
-
-\begin{tabular}{|c||c|c|c|c|}
-\hline  Gini & Current performance & \textbf{glmdisc} & Basic \textbf{glm} \\
-\hline
-\hline   Auto (n=50,000 ; d=15) & 57.9 & \textcolor{green}{64.84} & 58\\
-\hline   Revolving (n=48,000 ; d=9) & 58.57 & \textcolor{green}{67.15} & 53.5 \\
-\hline   Prospects (n=5,000 ; d=25) & 35.6 & \textcolor{green}{47.18} & 32.7\\
-\hline   Electronics (n=140,000 ; d=8) & \textcolor{green}{57.5} & \textcolor{green}{58} & -10 \\
-\hline   Young (n=5,000 ; d=25) & $\approx$ 15 & \textcolor{green}{30} & 12.2 \\
-\hline   Basel II (n=70,000 ; d=13) & \textcolor{green}{70} & \textcolor{green}{71.3} & 19 \\
-\hline 
-\end{tabular}
-
-\end{adjustbox}
-\end{center}
-\end{table}
-
-
-\end{frame}
 
 
 
@@ -2504,14 +2232,27 @@ Older results
 
 \section{Segmentation: logistic regression trees}
 
-{\setbeamercolor{background canvas}{bg=white}
-\setbeamercolor{normal text}{fg=black!90}
+\note{Ce qui apparaît sur le dernier tableau qu'on a vu, c'est que CACF dispose de pleins de segments de clientèle ou de portefeuilles sur lesquels il y a en fait des scores différents, alors que jusqu'à présent on s'est intéressé à un seul score.
+}
+
+{
+\setbeamercolor{background canvas}{bg=white}
+
 \begin{frame}
 \frametitle{\secname}
 
-\tikzstyle{level 1}=[level distance=1.5cm, sibling distance=9cm]
-\tikzstyle{level 2}=[level distance=1.5cm, sibling distance=4.5cm]
-\tikzstyle{level 3}=[level distance=2cm, sibling distance=3.5cm]
+
+
+
+%%%%%%%%%%
+\note{Un score est spécifique à un segment de clientèle. La segmentation de la clientèle peut se schématiser comme une arbre de décision. Arbre classique : les noeuds sont déterministes en fonction du produit financé p.ex. ; les feuilles sont des régression logistiques : des scores.}
+%%%%%%%%%%
+
+
+
+\tikzstyle{level 1}=[level distance=2cm, sibling distance=10cm]
+\tikzstyle{level 2}=[level distance=2cm, sibling distance=4.7cm]
+\tikzstyle{level 3}=[level distance=2cm, sibling distance=3.8cm]
 
 \begin{figure}
 \centering
@@ -2521,7 +2262,7 @@ Older results
     sibling distance        = 15em,
     level distance          = 5em,
     edge from parent/.style = {draw = black, -latex},
-    every node/.style       = {font=\footnotesize},
+    every node/.style       = {font=\large},
     sloped
   ]
   \node [root] {\textcolor{black}{Clients}}
@@ -2553,19 +2294,49 @@ Older results
 \caption{\textcolor{black}{Scorecards tree structure in acceptance system.} }
 \label{fig:arbre}
 \end{figure}
+
 \end{frame}
+
+
 }
 
+\setbeamercolor{normal text}{fg=white}
+\usebeamercolor[fg]{normal text}
 
 
 \begin{frame}
 \frametitle{\secname}
 
+
+%%%%%%%%%%%
+\note{Au moment d'un appel d'offre et pour la conquête d'un nouveau partenaire.
+
+\bigskip
+
+Performance et variables utilisés similaires.
+
+\bigskip
+
+Au moment de la création d'un score comme sur la slide d'introduction du contexte industriel en début de présentation.
+
+\bigskip
+
+On se propose de se replonger dans un cadre académique en simulant des données qui vont faire échouer la pratique industrielle de l'ACM}
+%%%%%%%%%%%
+
+
 Current procedure(s):
 \begin{itemize}
 \item<2-> Promise a new partner their own score to maximize acceptance;
 \item<3-> Merge existing ``close'' branches that show similar performance;
-\item<4-> Try basic ``clustering'' techniques, \textit{e.g.}\ MCA.
+\item<4-> \begin{minipage}[c]{0.1\linewidth}
+\only<4->{\begin{animateinline}[autoplay,loop]{2}%
+{\color{orange}{\bf CACF}}%
+\newframe \end{animateinline}}
+\end{minipage}
+\begin{minipage}[c]{0.85\linewidth}
+Try basic ``clustering'' techniques, \textit{e.g.}\ MCA.
+\end{minipage}
 \end{itemize}
 
 \bigskip
@@ -2583,10 +2354,21 @@ Problem(s):
 
 
 
-
-
 \begin{frame}
 \frametitle{\secname}
+
+%%%%%%%%%%%%%%%%%%%
+\note{On simule trois clusters apparents : les classes populaires, moyennes et aisées.
+
+\bigskip
+
+Leur performance de remboursement est néanmoins déterminé dans tous les cas par leur taux d'endettement.
+
+\bigskip
+
+Le vrai modèle est donc constitué d'une seule régression logistique là où une approche de type ACM va choisir de réaliser trois régressions.}
+%%%%%%%%%%%%%%%%%%%
+
 
 \hspace*{-2cm}\resizebox{1.2\textwidth}{!}{
 \begin{tikzpicture}[
@@ -2623,8 +2405,21 @@ Problem(s):
 
 
 
+
+
+
 \begin{frame}
 \frametitle{\secname}
+
+
+%%%%%%%%%%%%%%%%
+\note{On simule trois régressions différentes déterminées par une variable catégorielle, par exemple la catégorie socio-professionnelle.
+
+\bigskip
+
+Une approche de type ACM, même en connaissant la variable catégorielle, ne pourra trouver qu'un seul cluster puisqu'on ne fournit pas la variable cible, et produira donc de très mauvais résultats prédictifs que l'on vérifiera à la fin de cette partie.}
+%%%%%%%%%%%%%%%%
+
 
 \begin{tikzpicture}
 
@@ -2689,10 +2484,29 @@ Problem(s):
 
 
 
+
+
+
+
 \subsection{notations}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\note{On introduit quelques notations spécifiques à la segmentation. Comme pour les problèmes précédents, on suppose l'existence d'une vraie segmentation, c'est-à-dire de $K^\star$ segments, d'une affectation de chaque client $c^\star$, et de régressions logistiques pour chaque segment $\bm{\theta}^{\star, c^\star}$.
+
+\bigskip
+
+On aimerait utiliser les outils standards de sélection de modèle, comme le critère BIC utilisé jusqu'à présent, sauf que l'espace des segmentations possibles est à nouveau un problème discret intractable.
+
+\bigskip
+
+Sans surprise, on va à nouveau relaxer ce problème et proposer un algorithme itératif générant quelques propositions pertinentes de segmentations.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\setbeamercolor{normal text}{fg=white}
+%\usebeamercolor[fg]{normal text}
 
 $K$ segments.
 
@@ -2712,14 +2526,23 @@ $\mathbf{c} = (c_1, \dots, c_n)$: segment for all $n$ clients.
 \medskip
 
 \uncover<3->{
-We suppose there is a true segmentation $K^\star, \mathbf{c}^\star$ and logistic regressions $\bm{\theta}^{\star, c^\star}$ at its leaves.
+We suppose there is a true segmentation $K^\star, c^\star$ and logistic regressions $\bm{\theta}^{\star, c^\star}$ at its leaves.
 }
 
 \medskip
 
 \uncover<4->{
 If we could evaluate all segmentations, the best one could be selected by
-\[ (\hat{K}, \hat{\mathbf{c}}) = \argmax_{K,\mathbf{c}} \sum_{c=1}^K \text{BIC}(\hat{\bm{\theta}}^{c} ; \{(\bm{x}_i,y_i) | c_{i} = c, 1 \leq i \leq n\}),\]
+
+\begin{minipage}[c]{0.15\linewidth}
+\only<4->{\begin{animateinline}[autoplay,loop]{2}%
+{\color{orange}{\bf Statistician}}%
+\newframe \end{animateinline}}
+\end{minipage}
+\begin{minipage}[c]{0.8\linewidth}
+\vspace*{-0.5cm}
+\[ \hspace*{0.6cm} (\hat{K}, \hat{\mathbf{c}}) = \argmin_{K,\mathbf{c}} \sum_{c=1}^K \text{BIC}(\hat{\bm{\theta}}^{c} ; \{(\bm{x}_i,y_i) | c_{i} = c, 1 \leq i \leq n\}),\]
+\end{minipage}
 where $\hat{\bm{\theta}}^c$ is the MLE of the logistic regression of segment $c$.
 }
 
@@ -2727,10 +2550,32 @@ where $\hat{\bm{\theta}}^c$ is the MLE of the logistic regression of segment $c$
 
 
 
+
+
+
+
+
 \subsection{model proposal}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\note{
+Comme pour la quantification où l'on pouvait être dans plusieurs modalités à la fois dans des proportions différentes, on autorise ici les clients à être dans plusieurs segments à la fois, ce qui revient à considérer un modèle de mélange régression logistique, prédisant le remboursement du client sachant ses prédicteurs et son segment d'appartenance et arbre de décision, prédisant l'appartenance à un segment donné.
+
+D'un point de vue académique, on flexibilise la régression logistique par l'apport d'un modèle d'arbre non paramétrique tout en répondant à la contrainte industrielle d'interprétabilité.
+
+Ici encore, on met en oeuvre un algorithme de type EM qui va tirer le segment d'appartenance de chaque client selon la probabilité donné par le mélange.
+
+Une fois que l'on connait le segment d'appartenance, on peut estimer classiquement les paramètres de régression logistique de chaque segment et mettre à jour également le modèle d'arbre qui donne les segments.
+
+Comme pour la quantification, cette procédure est répétée un nombre de fois raisonnable et donné par l'utilisateur et il ne reste qu'à passer ces segmentations dans la moulinette du critère de sélection de modèle choisi, par exemple BIC.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
 
 Similarly to the quantization proposal: ability to be in several segments at a time.
 
@@ -2760,17 +2605,43 @@ Similarly to the quantization proposal: ability to be in several segments at a t
 
 \end{frame}
 
+
+
+
+
+
+
+
+
+
 \subsection{some results}
 
 \begin{frame}
 \frametitle{\secname: \subsecname}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%
+\note{
+
+Sur le premier jeu de données simulés présentés précédemment, le vrai modèle est une seule régression logistique qui est bien retrouvée par l'approche proposée à partir de 5 segments de départ. La méthode type ACM fait 3 régressions logistiques, toutes vraies également, mais qui utilisent moins de données et sont donc soumises à plus de variance, d'où le Gini plus faible.
+
+Parmi deux autres approches d'arbres de régressions logistiques trouvés dans la littérature, LMT a également retrouvé un seul segment.
+
+Pour le deuxième jeu de données, une seule régression logistique est trouvée par l'approche ACM puisqu'il n'y a pas de cluster apparent, d'où une performance faible. L'approche proposée retrouve bien les 3 segments. Pour les deux méthodes de la littérature, c'est cette fois MOB qui a bien retrouvé les 3 segments.
+
+En conclusion, on a proposé une méthode qui permet de résoudre le problème académique posé au départ sur des données simulées ; il reste à l'appliquer sur des jeux de données réelles, où elle semble prometteuse mais d'autres problèmes restent à résoudre (notamment le temps de calcul avec des prédicteurs catégoriels).}
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
 \begin{table}[t]
 \centering
 \begin{tabular}{ll|lllll}
- & Oracle = ALLR & \textit{glmtree}-SEM & FAMD & PLS & LMT & MOB \\
+ & Oracle = ALLR & \textit{glmtree}-SEM & FAMD & LMT & MOB \\
 \hline
-Gini & 69.7 & \textcolor{green}{\textbf{69.7}} & 65.3 & 47.0 & \textcolor{green}{\textbf{69.7}} & 64.8 \\
+Gini & 69.7 & \textcolor{green}{\textbf{69.7}} & 65.3 & \textcolor{green}{\textbf{69.7}} & 64.8 \\
 \end{tabular}
 \end{table}
 
@@ -2779,9 +2650,9 @@ Gini & 69.7 & \textcolor{green}{\textbf{69.7}} & 65.3 & 47.0 & \textcolor{green}
 \begin{table}[t]
 \centering
 \begin{tabular}{ll|llllll}
- & Oracle & ALLR & \textit{glmtree}-SEM & FAMD & PLS & LMT & MOB \\
+ & Oracle & ALLR & \textit{glmtree}-SEM & FAMD & LMT & MOB \\
 \hline
-Gini & 69.7 & 25.8 & \textcolor{green}{\textbf{69.7}} & 17.7 & 48.4 & 65.8 & \textcolor{green}{\textbf{69.7}} \\
+Gini & 69.7 & 25.8 & \textcolor{green}{\textbf{69.7}} & 17.7 & 65.8 & \textcolor{green}{\textbf{69.7}} \\
 \end{tabular}
 \end{table}
 
@@ -2789,39 +2660,15 @@ Gini & 69.7 & 25.8 & \textcolor{green}{\textbf{69.7}} & 17.7 & 48.4 & 65.8 & \te
 
 
 
-%\section{Bonus}
-%
-%
-%\begin{frame}[allowframebreaks]
-%\frametitle{\secname}
-%
-%\textbf{Big ``unstructured'' data}
-%
-%Some theoretical results about an ever bigger $d$ (not the one you think about though).
-%
-%\bigskip
-%
-%\textbf{Online logistic regression}
-%
-%What if we dynamically adjusted logistic regression coefficients of a given scorecard (still learnt on a cold database) on new data as they come in?
-%
-%\pagebreak
-%
-%\textbf{Profitability}
-%
-%Good / bad label is merely a proxy of the true performance measure: profitability.
-%
-%\underline{Already done}: weighting observations by the amount of the loan gives rise to roughly the same logistic regression coefficients.
-%
-%\bigskip
-%
-%\textbf{Predicting IR3 in 2 months based on the month's applications}
-%
-%Current process: finance people, wait 3 months, if risk $\neq$ budget then adjust acceptance policy, wait 3 months again and repeat.
-%
-%Couldn't we anticipate by looking at the quality (\textit{e.g.}\ through the score) of the applications?
-%
-%\end{frame}
+
+
+
+
+
+
+
+
+
 
 \section{Conclusion and future work}
 
@@ -2829,6 +2676,28 @@ Gini & 69.7 & 25.8 & \textcolor{green}{\textbf{69.7}} & 17.7 & 48.4 & 65.8 & \te
 
 \begin{frame}
 \frametitle{\subsecname}
+
+
+%%%%%%%%%%%%%%
+\note{
+En conclusion, cette thèse a permis de traiter trois problèmes inhérents au Credit Scoring:
+
+\medskip
+
+La réintégration des refusés, que l'on a reformulé comme un problème à variables manquantes, dont on a réinterprété certaines méthodes ad hoc. On ne regroupe aucune de ces méthodes, néanmoins elles sont implémentées dans un package R.
+
+\medskip
+
+Une sorte d'apprentissage de représentation sous contrainte des prédicteurs : la discrétisation ou le regroupement de modalités, la recherche d'interactions. On a replongé ce problème comme une sélection de modèle dans un très grand espace discret. On a proposé de relaxer ce problème, le rendre plus facile, et un mécanisme d'exploration intelligent de ce grand espace. On obtient de bonnes performances, et surtout un gain de temps significatif pour le statisticien. La méthode est implémentée dans un package R et Python.
+
+\medskip
+
+Enfin, la segmentation prédictive, c'est-à-dire les arbres de régression logistique où on a eu une approche similaire au problème de quantification, qui donne de très bons résultats sur les données simulées.
+}
+%%%%%%%%%%%%%%
+
+
+
 
 This PhD tackled three main issues of ``traditional'' Credit Scoring:
 \begin{enumerate}
@@ -2841,7 +2710,7 @@ This PhD tackled three main issues of ``traditional'' Credit Scoring:
 
 \medskip
 
-\only<4>{Conclusion: better performance, less time-consuming, some guarantees, \lstinline{glmdisc} \textsc{R} package.}
+\only<4>{Conclusion: better performance, less time-consuming, some guarantees, \lstinline{glmdisc} \textsc{R} and Python packages.}
 \item<5-> Predictive segmentation: logistic regression trees,
 
 \medskip
@@ -2852,10 +2721,30 @@ This PhD tackled three main issues of ``traditional'' Credit Scoring:
 \end{frame}
 
 
+
+
 \subsection{Future work}
 
 \begin{frame}
 \frametitle{\subsecname}
+
+
+
+%%%%%%%%%%%%%%
+\note{
+La poursuite des travaux de segmentation, en particulier sur des données réelles (même s'il y a déjà des premiers résultats), qui nécessiterait d'y inclure la quantification, la sélection de variables et éventuellement la recherche d'interactions, ce qui est un problème très combinatoire.
+
+\medskip
+
+Tous ces travaux concernent les pré-traitements des variables prédictives $x$, mais on pourrait s'intéresser à la définition de la variable cible, 2 mensualités impayées en un an, alors que l'objectif de l'institut financier est plutôt le profit.
+
+\medskip
+
+Enfin, à prédicteurs traditionnels fixes, toutes les ``optimisations'' dont on a parlé jusqu'à présent permettent essentiellement de gagner un temps significatif avec une augmentation faible à modérée de performance. Un vrai gain de performance éventuel viendrait sans doute avec la collecte et le traitement rigoureux de plus grandes quantités de données, en particulier les données non structurées et souvent très fines comme les données de cookies, de logs, de parcours de visite sur les sites internet, etc. ce qui est sans doute l'espoir majeur du Credit Scoring à moyen terme, et pourrait par exemple justifier une autre thèse CIFRE...
+}
+%%%%%%%%%%%%%%
+
+
 
 There remains a lot of open questions:
 \begin{enumerate}
@@ -2880,13 +2769,26 @@ There remains a lot of open questions:
 
 
 
+
+
+
+
 \begin{frame}
+
+
+%%%%%%%%%%%%%%
+\note{... mais pour ma part j'en ai terminé ! Merci pour votre attention.}
+%%%%%%%%%%%%%%
 
 \Huge
 
 Thanks!
 
 \end{frame}
+
+
+
+
 
 
 \begin{frame}[allowframebreaks]
@@ -2896,6 +2798,264 @@ Thanks!
 \end{scriptsize}
 \end{frame}
 
+
+
+
+\appendix
+
+
+\section{Bivariate interactions}
+
+\subsection{notations}
+
+\begin{frame}
+\frametitle{\secname: \subsecname}
+
+Upper triangular matrix with $\delta_{k,\ell} = 1 $ if $k < \ell$ and features $k$ and $\ell$ ``interact'' in the logistic regression.
+\[ \text{logit}(p_{\bm{\theta}}(1|\q(\bm{x}))) = \theta_0 + \sum_{j=1}^{d} \theta_j^{\q_j(x_j)} + \sum_{1\leq k < \ell \leq d} \delta_{k,\ell} \theta_{k,\ell}^{\q_k(x_k) f_{\ell}(x_{\ell})} \]
+\uncover<2->{
+Imagine for now that the discretization $\q(\bm{x})$ is fixed. The criterion becomes:
+\begin{align*}
+(\bm{\theta}^\star,\bm{\delta}^\star) & = \argmax_{\bm{\theta},\textcolor{yellow}{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}}} \sum_{i=1}^n \ln p_{\bm{\theta}}(y_i|\q(\bm{x}_i),\bm{\delta}) - \text{penalty}(n;\bm{\theta}) 
+\end{align*}
+}
+\uncover<3->{
+Analogous to previous problem: $2^{\frac{d(d-1)}{2}}$ models.
+}
+
+
+\end{frame}
+
+
+
+
+\subsection{model proposal}
+\begin{frame}
+\frametitle{\secname: \subsecname}
+
+$\delta$ is latent and hard to optimize over: use a stochastic algorithm!
+
+\bigskip
+
+\uncover<2->{
+Strategy used here: Metropolis-Hastings sampling algorithm.
+
+{\bf Idea:} propose well-chosen interactions and accept / reject them based on the BIC criterion of the resulting logistic regression.
+}
+
+\only<3>{
+\begin{align*}
+p(y|\bqk ) & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \bqk, \bm{\delta}) p(\bm{\delta}) \\
+p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) p(\bm{\delta})
+\end{align*}
+}
+\uncover<4->{
+\begin{align*}
+p(y| \bqk ) & = \sum_{\bm{\delta} \in \{0,1\}^\frac{d(d-1)}{2}} p(y | \bqk, \bm{\delta}) p(\bm{\delta}) \\
+p(\bm{\delta} | \bqk,y) & \propto \exp(-\text{BIC}[\bm{\delta}]/2) \textcolor{yellow}{\cancel{p(\bm{\delta})}} \hspace{1cm} p(\delta_{p,q}) = \frac{1}{2}
+\end{align*}
+}
+\uncover<5->{
+Which transition proposal $\tr: ({\{0,1\}}^{\frac{d(d-1)}{2}},{\{0,1\}}^{\frac{d(d-1)}{2}}) \mapsto [0 ; 1]$?
+}
+
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{\secname: \subsecname}
+
+$2^{d(d-1)}$ probabilities to calculate\dots
+
+\bigskip
+
+\uncover<2->{
+\textbf{We restrict changes to only one entry $\delta_{k,\ell}$.}
+}
+
+\bigskip
+
+\uncover<3->{
+\textbf{Proposal:} gain/loss in BIC between \textcolor{yellow}{bivariate} models \textcolor{yellow}{with} / \textcolor{yellow}{without} the interaction.
+}
+
+\bigskip
+
+\uncover<4->{
+If the interaction between two features is meaningful when only these two features are considered, there is a good chance that it will be in the full multivariate model.
+}
+
+\bigskip
+
+\uncover<5->{
+\textbf{Trick:} alternate one discretization  / grouping step and one ``interaction'' step.
+}
+
+\end{frame}
+
+
+
+
+
+
+
+\section{SEM-Gibbs quantization}
+
+\begin{frame}
+\frametitle{\secname}
+
+Originally (and as implemented in the \textsc{R} package glmdisc), the optimization was a bit different:
+\begin{itemize}
+\item<2-> $\q$ is considered a latent (unobserved) feature;
+\item<3-> A classical EM algorithm is intractable since it requires an Expectation step over all possible quantizations;
+\item<4-> Solution: random draw $\approx$ Bayesian statistics;
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{\subsecname: estimation}
+
+``Classical'' estimation strategy with latent variables: EM algorithm.
+
+\bigskip
+
+\uncover<2->{
+There would still be a sum over $\bm{\mathcal{Q}}_{\bm{m}}$: $p(y|\bm{x},\bm{\theta},\bm{\alpha}) = \sum_{\q \in \bm{\mathcal{Q}}_{\bm{m}}} p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha}_j}(\q_j|x_j)$
+}
+
+\bigskip
+
+\uncover<3->{
+Use a Stochastic-EM! Draw $\q$ knowing that:
+}
+\medskip
+\uncover<4->{
+\[p(\q|\bm{x},y) = \underbrace{\dfrac{p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha_j}}(\q_j|x_j)}{\sum_{\bm{q} \in \bm{\mathcal{Q}}_{\bm{m}}} p_{\bm{\theta}}(y|\q) \prod_{j=1}^d p_{\bm{\alpha}_j}(\q_j|x_j)}}_{\text{still difficult to calculate}}\]
+}
+\medskip
+\uncover<5->{
+Gibbs-sampling step:
+\[p(\q_j|\bm{x},y,\q_{\{-j\}}) \propto p_{\bm{\theta}}(y|\q) p_{\bm{\alpha_j}}(\q_j|x_j)\]
+}
+
+
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{\secname: algorithm}
+
+\tiny
+
+
+\textbf{Initialization}
+
+
+\medskip
+
+$\left( \begin{array}{ccc}
+x_{1,1} & \cdots & x_{1,d}  \\
+ \vdots & \vdots & \vdots \\
+ x_{n,1} & \cdots & x_{n,d} \end{array} \right)
+\begin{array}{c}
+\text{at random} \\
+\Rightarrow \end{array}
+\left( \begin{array}{ccc}
+\q_{1,1} & \cdots & \q_{1,d}  \\
+ \vdots & \vdots & \vdots \\
+ \q_{n,1} & \cdots & \q_{n,d} \end{array} \right)$
+
+\medskip
+
+\textbf{Loop}
+
+\medskip
+
+$\left( \begin{array}{c}
+y_1 \\
+\vdots \\
+y_n \end{array} \right)
+\begin{array}{c}
+\text{logistic} \\
+\text{regression} \\
+\Rightarrow \end{array}
+\left( \begin{array}{ccc}
+\q_{1,1} & \cdots & \q_{1,d}  \\
+ \vdots & \vdots & \vdots \\
+ \q_{n,1} & \cdots & \q_{n,d} \end{array} \right)
+\begin{array}{c}
+\text{polytomous} \\
+\text{regression} \\
+\Rightarrow \end{array}
+\left( \begin{array}{ccc}
+x_{1,1} & \cdots & x_{1,d}  \\
+ \vdots & \vdots & \vdots \\
+ x_{n,1} & \cdots & x_{n,d} \end{array} \right)
+$
+
+\medskip
+
+\textbf{Updating $\q$}
+
+\medskip
+
+$\left( \begin{array}{c}
+p(y_1,\q_{1,j}=k|\bm{x}_i)  \\
+\vdots \\
+p(y_n,\q_{n,j}=k|\bm{x}_i) \end{array} \right)
+\begin{array}{c}
+\text{random} \\
+\text{sampling} \\
+\Rightarrow \end{array}
+\left( \begin{array}{ccc}
+\q_{1,j}  \\
+ \vdots \\
+ \q_{n,j} \end{array} \right)$
+
+\medskip
+
+\textbf{Calculating $\q^{\text{MAP}}$}
+
+\medskip
+
+$\left( \begin{array}{c}
+\q^{\text{MAP},1,j}  \\
+\vdots \\
+\q^{\text{MAP},n,j} \end{array} \right)
+\begin{array}{c}
+\text{MAP} \\
+\text{estimate} \\
+= \end{array}
+\left( \begin{array}{ccc}
+\argmax_{\q_j} p_{\bm{\alpha_j}}(\q_j | x_{1,j})  \\
+ \vdots \\
+\argmax_{\q_j} p_{\bm{\alpha_j}}(\q_j | x_{n,j}) \end{array} \right)$
+ 
+ 
+\normalsize
+
+\end{frame}
+
+
+
+
+
+
+\begin{frame}
+\frametitle{\secname : simulations}
+
+\begin{figure}
+%\begin{animateinline}[poster=first, controls, palindrome, buttonfg=white]{5}
+%\multiframe{200}{i=1+1}{\input{CODE_FIGURES/GLMDISC_SEM/sem_feature_1_iter_\i.tex}}%
+%\end{animateinline}
+\end{figure}
+
+\end{frame}
 
 
 \end{document}
