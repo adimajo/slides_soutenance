@@ -6,7 +6,7 @@ Formalisation et étude de problématiques de scoring en risque de crédit
 Inférence de rejet, discrétisation de variables et interactions, arbres de régression logistique  
 
 Thèse de Doctorat en Mathématiques et leurs interactions de l'Université de Lille, Spécialité Statistique  
-Soutenue le ...  
+Soutenue le 30/09/2019  
 Préparée au sein du Laboratoire Paul Painlevé, de l'Inria Lille  
 Nord-Europe et de Crédit Agricole Consumer Finance.  
 École doctorale Sciences pour l’Ingénieur  
@@ -33,7 +33,7 @@ Formalization and study of statistical problems in Credit Scoring
 Reject inference, discretization and pairwise interactions, logistic regression trees  
 
 PhD of Applied Mathematics from the University of Lille, Speciality Statistics  
-Thesis defended on ...  
+Thesis defended on 30/09/2019  
 Prepared at Laboratoire Paul Painlevé, Inria Lille Nord-Europe and Crédit Agricole Consumer Finance.  
 Doctoral School Sciences pour l’Ingénieur  
 University Department Équipe-projet MODAL
